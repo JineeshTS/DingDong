@@ -1748,6 +1748,103 @@
 
 ---
 
+#### ⏳ Phase 7: Use Cases (Business Logic Layer) - IN PROGRESS (18% Complete)
+**Dependencies**: ✅ All repositories complete
+
+**Implementation Strategy**:
+- Create use cases for each domain operation
+- Implement business logic and validation rules
+- Connect repositories to business operations
+- Handle complex workflows and transactions
+- Apply SOLID principles and single responsibility
+- Prepare for state management integration
+
+**Target**: ~100+ use cases across 11 domains
+
+**✅ Completed Use Cases** (18/100+):
+
+**Authentication Domain** (11/10 COMPLETE) ✅
+**Commit**: `4ef5e90` - All authentication use cases implemented (439 lines)
+1. ✅ SignInWithEmailUseCase - Email/password validation
+2. ✅ SignUpWithEmailUseCase - Strong password requirements
+3. ✅ SignInWithGoogleUseCase - Google OAuth
+4. ✅ SignInWithAppleUseCase - Apple OAuth
+5. ✅ SignInWithMicrosoftUseCase - Microsoft OAuth
+6. ✅ SignOutUseCase - User sign out
+7. ✅ GetCurrentUserUseCase - Retrieve authenticated user
+8. ✅ UpdateProfileUseCase - Display name/photo validation
+9. ✅ UpdatePasswordUseCase - Password strength validation
+10. ✅ DeleteAccountUseCase - Account deletion with password
+11. ✅ SendPasswordResetEmailUseCase - Email validation
+
+**Task Domain** (8/25+ PARTIAL) ⏳
+**Commit**: `68d4cab` - Core task management use cases (226 lines)
+1. ✅ CreateTaskUseCase - Comprehensive validation
+2. ✅ UpdateTaskUseCase - Business rules enforcement
+3. ✅ CompleteTaskUseCase - Mark as done
+4. ✅ DeleteTaskUseCase - Soft delete
+5. ✅ GetTasksDueTodayUseCase - Today's tasks
+6. ✅ GetOverdueTasksUseCase - Overdue tracking
+7. ✅ SearchTasksUseCase - Multi-criteria filtering
+8. ✅ BatchCompleteTasksUseCase - Bulk operations
+
+**⏳ Remaining Task Use Cases** (17+ more):
+- GetTask, UncompleteTask, MoveTask, DuplicateTask
+- GetTasksByPriority, GetTasksByTag, GetAssignedTasks
+- GetCompletedTasks, BatchDeleteTasks, BatchUpdateTasks
+- UpdateSortOrder, GenerateRecurringInstance
+- And 5+ more...
+
+**List Domain** (15 use cases):
+- CreateList, UpdateList, DeleteList, GetLists
+- ShareList, ToggleFavorite, ArchiveList
+- ManageCollaborators, AcceptInvitation
+- And 6+ more list operations...
+
+**User Domain** (10 use cases):
+- GetUser, UpdateUser, UpdatePreferences
+- ManageSubscription, ToggleBiometricAuth
+- ExportUserData, DeactivateAccount
+- And 3+ more user operations...
+
+**Reminder Domain** (8 use cases):
+- CreateReminder, UpdateReminder, DeleteReminder
+- GetRemindersDueSoon, EnableReminder, DisableReminder
+- SnoozeReminder, MarkReminderTriggered
+
+**Tag Domain** (8 use cases):
+- CreateTag, UpdateTag, DeleteTag, GetTags
+- MergeTags, IncrementTagUsage, GetPopularTags, RestoreTag
+
+**Comment Domain** (8 use cases):
+- CreateComment, UpdateComment, DeleteComment
+- AddReaction, RemoveReaction, SearchComments
+- GetCommentsWithMentions, GetCommentCount
+
+**Attachment Domain** (8 use cases):
+- UploadAttachment, DownloadAttachment, DeleteAttachment
+- GetAttachmentsByTask, GetAttachmentsByType
+- GetTotalStorageUsed, BatchDeleteAttachments, MarkAsDownloaded
+
+**Habit Domain** (10 use cases):
+- CreateHabit, UpdateHabit, DeleteHabit, GetHabits
+- CheckInHabit, UndoCheckIn, CalculateStreak
+- GetHabitsDueToday, GetHabitStatistics, ArchiveHabit
+
+**FocusSession Domain** (10 use cases):
+- StartFocusSession, PauseFocusSession, ResumeFocusSession
+- CompleteFocusSession, CancelFocusSession
+- GetActiveFocusSession, GetFocusStatistics
+- GetFocusTrends, AddInterruption, GetFocusTimeByTask
+
+**Workspace Domain** (10 use cases):
+- CreateWorkspace, UpdateWorkspace, DeleteWorkspace
+- AddMember, RemoveMember, UpdateMemberRole
+- AcceptInvitation, LeaveWorkspace, TransferOwnership
+- GetWorkspaceStatistics
+
+---
+
 ### Code Statistics (As of November 10, 2025 - Latest)
 
 **Total Lines of Code**: ~29,100+
