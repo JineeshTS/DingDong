@@ -12,6 +12,7 @@ import '../screens/onboarding/onboarding_screen.dart';
 import '../screens/tasks/task_list_screen.dart';
 import '../screens/tasks/task_detail_screen.dart';
 import '../screens/tasks/task_form_screen.dart';
+import '../screens/calendar/calendar_screen.dart';
 import 'main_scaffold.dart';
 
 /// App router configuration using GoRouter with authentication
@@ -100,8 +101,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/calendar',
             name: 'calendar',
-            pageBuilder: (context, state) => NoTransitionPage(
-              child: const _CalendarPlaceholder(),
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: CalendarScreen(),
             ),
           ),
 
