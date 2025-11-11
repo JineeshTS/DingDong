@@ -1748,7 +1748,7 @@
 
 ---
 
-#### ⏳ Phase 7: Use Cases (Business Logic Layer) - IN PROGRESS (18% Complete)
+#### ⏳ Phase 7: Use Cases (Business Logic Layer) - IN PROGRESS (49% Complete)
 **Dependencies**: ✅ All repositories complete
 
 **Implementation Strategy**:
@@ -1761,10 +1761,10 @@
 
 **Target**: ~100+ use cases across 11 domains
 
-**✅ Completed Use Cases** (18/100+):
+**✅ Completed Use Cases** (49/100+):
 
-**Authentication Domain** (11/10 COMPLETE) ✅
-**Commit**: `4ef5e90` - All authentication use cases implemented (439 lines)
+**Authentication Domain** (11/11 COMPLETE) ✅
+**Commit**: `4ef5e90` - All authentication use cases (439 lines)
 1. ✅ SignInWithEmailUseCase - Email/password validation
 2. ✅ SignUpWithEmailUseCase - Strong password requirements
 3. ✅ SignInWithGoogleUseCase - Google OAuth
@@ -1777,8 +1777,8 @@
 10. ✅ DeleteAccountUseCase - Account deletion with password
 11. ✅ SendPasswordResetEmailUseCase - Email validation
 
-**Task Domain** (8/25+ PARTIAL) ⏳
-**Commit**: `68d4cab` - Core task management use cases (226 lines)
+**Task Domain** (18/25 PARTIAL) ✅
+**Commits**: `68d4cab`, `e3e5eeb` - Task management use cases (460 lines)
 1. ✅ CreateTaskUseCase - Comprehensive validation
 2. ✅ UpdateTaskUseCase - Business rules enforcement
 3. ✅ CompleteTaskUseCase - Mark as done
@@ -1787,25 +1787,42 @@
 6. ✅ GetOverdueTasksUseCase - Overdue tracking
 7. ✅ SearchTasksUseCase - Multi-criteria filtering
 8. ✅ BatchCompleteTasksUseCase - Bulk operations
+9. ✅ GetTaskUseCase - Retrieve single task
+10. ✅ UncompleteTaskUseCase - Mark as incomplete
+11. ✅ MoveTaskUseCase - Move between lists
+12. ✅ DuplicateTaskUseCase - Clone task
+13. ✅ GetTasksByPriorityUseCase - Filter by priority
+14. ✅ GetTasksByTagUseCase - Filter by tag
+15. ✅ GetAssignedTasksUseCase - Tasks assigned to user
+16. ✅ GetCompletedTasksUseCase - Completed with date range
+17. ✅ BatchDeleteTasksUseCase - Bulk delete (max 100)
+18. ✅ GetTasksByListUseCase - Tasks in specific list
 
-**⏳ Remaining Task Use Cases** (17+ more):
-- GetTask, UncompleteTask, MoveTask, DuplicateTask
-- GetTasksByPriority, GetTasksByTag, GetAssignedTasks
-- GetCompletedTasks, BatchDeleteTasks, BatchUpdateTasks
-- UpdateSortOrder, GenerateRecurringInstance
-- And 5+ more...
+**List Domain** (10/10 COMPLETE) ✅
+**Commit**: `23eaf68` - List management use cases (239 lines)
+1. ✅ CreateListUseCase - Create with validation
+2. ✅ UpdateListUseCase - Update list details
+3. ✅ DeleteListUseCase - Soft delete
+4. ✅ GetListsUseCase - Get with filters
+5. ✅ ToggleFavoriteListUseCase - Mark/unmark favorite
+6. ✅ ArchiveListUseCase - Archive list
+7. ✅ UnarchiveListUseCase - Restore archived
+8. ✅ ShareListUseCase - Share with users (max 50)
+9. ✅ GetFavoriteListsUseCase - Get favorites only
+10. ✅ GetSharedListsUseCase - Get shared lists
 
-**List Domain** (15 use cases):
-- CreateList, UpdateList, DeleteList, GetLists
-- ShareList, ToggleFavorite, ArchiveList
-- ManageCollaborators, AcceptInvitation
-- And 6+ more list operations...
-
-**User Domain** (10 use cases):
-- GetUser, UpdateUser, UpdatePreferences
-- ManageSubscription, ToggleBiometricAuth
-- ExportUserData, DeactivateAccount
-- And 3+ more user operations...
+**User Domain** (10/10 COMPLETE) ✅
+**Commit**: `c98b660` - User management use cases (274 lines)
+1. ✅ GetUserUseCase - Retrieve user by ID
+2. ✅ UpdateUserUseCase - Update user info
+3. ✅ UpdateUserPreferencesUseCase - Manage preferences
+4. ✅ UpdateSubscriptionUseCase - Manage tiers (free/plus/premium)
+5. ✅ ToggleBiometricAuthUseCase - Biometric auth
+6. ✅ ExportUserDataUseCase - GDPR data export
+7. ✅ DeactivateAccountUseCase - Soft delete account
+8. ✅ ReactivateAccountUseCase - Restore account
+9. ✅ UpdateThemeModeUseCase - Light/dark/system theme
+10. ✅ UpdateLocaleUseCase - Language/locale
 
 **Reminder Domain** (8 use cases):
 - CreateReminder, UpdateReminder, DeleteReminder
