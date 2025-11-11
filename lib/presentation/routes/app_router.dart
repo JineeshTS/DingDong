@@ -10,6 +10,8 @@ import '../screens/auth/register_screen.dart';
 import '../screens/auth/forgot_password_screen.dart';
 import '../screens/onboarding/onboarding_screen.dart';
 import '../screens/tasks/task_list_screen.dart';
+import '../screens/tasks/task_detail_screen.dart';
+import '../screens/tasks/task_form_screen.dart';
 import 'main_scaffold.dart';
 
 /// App router configuration using GoRouter with authentication
@@ -71,14 +73,25 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 name: 'task-detail',
                 builder: (context, state) {
                   final taskId = state.pathParameters['id']!;
-                  return _TaskDetailPlaceholder(taskId: taskId);
+                  return TaskDetailScreen(taskId: taskId);
                 },
+                routes: [
+                  // Edit task
+                  GoRoute(
+                    path: 'edit',
+                    name: 'edit-task',
+                    builder: (context, state) {
+                      final taskId = state.pathParameters['id']!;
+                      return TaskFormScreen(taskId: taskId);
+                    },
+                  ),
+                ],
               ),
               // Create task
               GoRoute(
                 path: 'create',
                 name: 'create-task',
-                builder: (context, state) => const _CreateTaskPlaceholder(),
+                builder: (context, state) => const TaskFormScreen(),
               ),
             ],
           ),
