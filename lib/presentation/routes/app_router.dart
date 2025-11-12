@@ -13,6 +13,7 @@ import '../screens/tasks/task_list_screen.dart';
 import '../screens/tasks/task_detail_screen.dart';
 import '../screens/tasks/task_form_screen.dart';
 import '../screens/calendar/calendar_screen.dart';
+import '../screens/kanban/kanban_screen.dart';
 import 'main_scaffold.dart';
 
 /// App router configuration using GoRouter with authentication
@@ -110,8 +111,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/kanban',
             name: 'kanban',
-            pageBuilder: (context, state) => NoTransitionPage(
-              child: const _KanbanPlaceholder(),
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: KanbanScreen(),
             ),
           ),
 
@@ -246,40 +247,6 @@ class _CalendarPlaceholder extends StatelessWidget {
           AppSpacing.verticalSpaceMD,
           Text(
             'Calendar View',
-            style: AppTypography.headlineMedium.copyWith(
-              color: AppColors.gray600,
-            ),
-          ),
-          AppSpacing.verticalSpaceXS,
-          Text(
-            'Coming soon',
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.gray500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _KanbanPlaceholder extends StatelessWidget {
-  const _KanbanPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.view_kanban,
-            size: AppSpacing.iconXXL,
-            color: AppColors.gray400,
-          ),
-          AppSpacing.verticalSpaceMD,
-          Text(
-            'Kanban Board',
             style: AppTypography.headlineMedium.copyWith(
               color: AppColors.gray600,
             ),
