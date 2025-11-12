@@ -15,6 +15,7 @@ import '../screens/tasks/task_form_screen.dart';
 import '../screens/calendar/calendar_screen.dart';
 import '../screens/kanban/kanban_screen.dart';
 import '../screens/eisenhower/eisenhower_matrix_screen.dart';
+import '../screens/focus/focus_screen.dart';
 import 'main_scaffold.dart';
 
 /// App router configuration using GoRouter with authentication
@@ -130,8 +131,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/focus',
             name: 'focus',
-            pageBuilder: (context, state) => NoTransitionPage(
-              child: const _FocusPlaceholder(),
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: FocusScreen(),
             ),
           ),
 
@@ -257,40 +258,6 @@ class _CalendarPlaceholder extends StatelessWidget {
           AppSpacing.verticalSpaceMD,
           Text(
             'Calendar View',
-            style: AppTypography.headlineMedium.copyWith(
-              color: AppColors.gray600,
-            ),
-          ),
-          AppSpacing.verticalSpaceXS,
-          Text(
-            'Coming soon',
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.gray500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FocusPlaceholder extends StatelessWidget {
-  const _FocusPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.timer,
-            size: AppSpacing.iconXXL,
-            color: AppColors.gray400,
-          ),
-          AppSpacing.verticalSpaceMD,
-          Text(
-            'Focus Mode',
             style: AppTypography.headlineMedium.copyWith(
               color: AppColors.gray600,
             ),
