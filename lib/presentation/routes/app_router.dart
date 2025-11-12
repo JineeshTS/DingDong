@@ -16,6 +16,7 @@ import '../screens/calendar/calendar_screen.dart';
 import '../screens/kanban/kanban_screen.dart';
 import '../screens/eisenhower/eisenhower_matrix_screen.dart';
 import '../screens/focus/focus_screen.dart';
+import '../screens/analytics/analytics_dashboard_screen.dart';
 import 'main_scaffold.dart';
 
 /// App router configuration using GoRouter with authentication
@@ -133,6 +134,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             name: 'focus',
             pageBuilder: (context, state) => const NoTransitionPage(
               child: FocusScreen(),
+            ),
+          ),
+
+          // Analytics
+          GoRoute(
+            path: '/analytics',
+            name: 'analytics',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: AnalyticsDashboardScreen(),
             ),
           ),
 
