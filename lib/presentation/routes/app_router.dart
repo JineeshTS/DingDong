@@ -14,6 +14,7 @@ import '../screens/tasks/task_detail_screen.dart';
 import '../screens/tasks/task_form_screen.dart';
 import '../screens/calendar/calendar_screen.dart';
 import '../screens/kanban/kanban_screen.dart';
+import '../screens/eisenhower/eisenhower_matrix_screen.dart';
 import 'main_scaffold.dart';
 
 /// App router configuration using GoRouter with authentication
@@ -113,6 +114,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             name: 'kanban',
             pageBuilder: (context, state) => const NoTransitionPage(
               child: KanbanScreen(),
+            ),
+          ),
+
+          // Eisenhower Matrix
+          GoRoute(
+            path: '/eisenhower',
+            name: 'eisenhower',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: EisenhowerMatrixScreen(),
             ),
           ),
 
