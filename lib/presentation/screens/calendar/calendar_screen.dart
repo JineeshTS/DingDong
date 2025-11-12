@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../config/theme/design_system.dart';
 import '../../providers/calendar/calendar.dart';
+import 'widgets/month_view_calendar.dart';
+import 'widgets/week_view_calendar.dart';
+import 'widgets/day_view_calendar.dart';
 
 /// Calendar screen with month, week, and day views
 ///
@@ -133,154 +136,15 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   }
 
   Widget _buildMonthView() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.calendar_month,
-            size: 64,
-            color: AppColors.gray400,
-          ),
-          AppSpacing.verticalSpaceMD,
-          Text(
-            'Month View',
-            style: AppTypography.headlineMedium.copyWith(
-              color: AppColors.gray600,
-            ),
-          ),
-          AppSpacing.verticalSpaceXS,
-          Text(
-            'Calendar month view coming soon',
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.gray500,
-            ),
-          ),
-          AppSpacing.verticalSpaceMD,
-          Text(
-            'Foundation complete with:',
-            style: AppTypography.labelMedium.copyWith(
-              color: AppColors.gray600,
-            ),
-          ),
-          AppSpacing.verticalSpaceXS,
-          Text(
-            '✓ Calendar state management\n'
-            '✓ Date navigation logic\n'
-            '✓ Task integration providers\n'
-            '✓ Filter support',
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.gray500,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
+    return const MonthViewCalendar();
   }
 
   Widget _buildWeekView() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.view_week,
-            size: 64,
-            color: AppColors.gray400,
-          ),
-          AppSpacing.verticalSpaceMD,
-          Text(
-            'Week View',
-            style: AppTypography.headlineMedium.copyWith(
-              color: AppColors.gray600,
-            ),
-          ),
-          AppSpacing.verticalSpaceXS,
-          Text(
-            'Calendar week view coming soon',
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.gray500,
-            ),
-          ),
-        ],
-      ),
-    );
+    return const WeekViewCalendar();
   }
 
   Widget _buildDayView() {
-    final selectedDate = ref.watch(selectedDateProvider);
-    final tasks = ref.watch(tasksForDateProvider(selectedDate));
-
-    return Column(
-      children: [
-        Container(
-          padding: AppSpacing.paddingMD,
-          color: AppColors.gray50,
-          child: Row(
-            children: [
-              Icon(
-                Icons.calendar_today,
-                color: AppColors.primary,
-              ),
-              AppSpacing.horizontalSpaceSM,
-              Text(
-                'Tasks for ${_formatDate(selectedDate)}',
-                style: AppTypography.titleMedium,
-              ),
-              const Spacer(),
-              Text(
-                '${tasks.length} tasks',
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.gray600,
-                ),
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: tasks.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.task_alt,
-                        size: 64,
-                        color: AppColors.gray400,
-                      ),
-                      AppSpacing.verticalSpaceMD,
-                      Text(
-                        'No tasks for this day',
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.gray500,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              : ListView.builder(
-                  padding: AppSpacing.pagePadding,
-                  itemCount: tasks.length,
-                  itemBuilder: (context, index) {
-                    final task = tasks[index];
-                    return ListTile(
-                      title: Text(task.title),
-                      subtitle: task.description != null
-                          ? Text(task.description!)
-                          : null,
-                      trailing: Checkbox(
-                        value: task.isCompleted,
-                        onChanged: (_) {
-                          // TODO: Toggle task completion
-                        },
-                      ),
-                    );
-                  },
-                ),
-        ),
-      ],
-    );
+    return const DayViewCalendar();
   }
 
   Widget _buildError(String error) {
@@ -318,23 +182,5 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
         ],
       ),
     );
-  }
-
-  String _formatDate(DateTime date) {
-    const months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December'
-    ];
-    return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 }
