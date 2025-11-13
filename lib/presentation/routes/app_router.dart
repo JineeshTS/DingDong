@@ -20,6 +20,7 @@ import '../screens/analytics/analytics_dashboard_screen.dart';
 import '../screens/focus_timer/focus_timer_screen.dart';
 import '../screens/time_tracking/time_tracking_screen.dart';
 import '../screens/habit_tracker/habit_tracker_screen.dart';
+import '../screens/goals/goals_screen.dart';
 import 'main_scaffold.dart';
 
 /// App router configuration using GoRouter with authentication
@@ -173,6 +174,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             name: 'habits',
             pageBuilder: (context, state) => const NoTransitionPage(
               child: HabitTrackerScreen(),
+            ),
+          ),
+
+          // Goals & Milestones
+          GoRoute(
+            path: '/goals',
+            name: 'goals',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: GoalsScreen(),
             ),
           ),
 
