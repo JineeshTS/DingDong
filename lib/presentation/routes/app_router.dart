@@ -18,6 +18,7 @@ import '../screens/eisenhower/eisenhower_matrix_screen.dart';
 import '../screens/focus/focus_screen.dart';
 import '../screens/analytics/analytics_dashboard_screen.dart';
 import '../screens/focus_timer/focus_timer_screen.dart';
+import '../screens/time_tracking/time_tracking_screen.dart';
 import 'main_scaffold.dart';
 
 /// App router configuration using GoRouter with authentication
@@ -153,6 +154,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             name: 'focus-timer',
             pageBuilder: (context, state) => const NoTransitionPage(
               child: FocusTimerScreen(),
+            ),
+          ),
+
+          // Time Tracking
+          GoRoute(
+            path: '/time-tracking',
+            name: 'time-tracking',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: TimeTrackingScreen(),
             ),
           ),
 
