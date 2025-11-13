@@ -22,6 +22,7 @@ import '../screens/time_tracking/time_tracking_screen.dart';
 import '../screens/habit_tracker/habit_tracker_screen.dart';
 import '../screens/goals/goals_screen.dart';
 import '../screens/workspaces/workspaces_screen.dart';
+import '../screens/lists/shared_lists_screen.dart';
 import 'main_scaffold.dart';
 
 /// App router configuration using GoRouter with authentication
@@ -193,6 +194,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             name: 'workspaces',
             pageBuilder: (context, state) => const NoTransitionPage(
               child: WorkspacesScreen(),
+            ),
+          ),
+
+          // Shared Lists
+          GoRoute(
+            path: '/shared-lists',
+            name: 'shared-lists',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: SharedListsScreen(),
             ),
           ),
 
