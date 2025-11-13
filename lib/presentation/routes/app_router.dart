@@ -23,6 +23,7 @@ import '../screens/habit_tracker/habit_tracker_screen.dart';
 import '../screens/goals/goals_screen.dart';
 import '../screens/workspaces/workspaces_screen.dart';
 import '../screens/lists/shared_lists_screen.dart';
+import '../screens/teams/team_dashboard_screen.dart';
 import 'main_scaffold.dart';
 
 /// App router configuration using GoRouter with authentication
@@ -203,6 +204,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             name: 'shared-lists',
             pageBuilder: (context, state) => const NoTransitionPage(
               child: SharedListsScreen(),
+            ),
+          ),
+
+          // Team Dashboard
+          GoRoute(
+            path: '/team-dashboard',
+            name: 'team-dashboard',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: TeamDashboardScreen(),
             ),
           ),
 
