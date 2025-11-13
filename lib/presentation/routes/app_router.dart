@@ -24,6 +24,7 @@ import '../screens/goals/goals_screen.dart';
 import '../screens/workspaces/workspaces_screen.dart';
 import '../screens/lists/shared_lists_screen.dart';
 import '../screens/teams/team_dashboard_screen.dart';
+import '../screens/templates/templates_screen.dart';
 import 'main_scaffold.dart';
 
 /// App router configuration using GoRouter with authentication
@@ -213,6 +214,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             name: 'team-dashboard',
             pageBuilder: (context, state) => const NoTransitionPage(
               child: TeamDashboardScreen(),
+            ),
+          ),
+
+          // Templates
+          GoRoute(
+            path: '/templates',
+            name: 'templates',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: TemplatesScreen(),
             ),
           ),
 
