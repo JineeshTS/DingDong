@@ -26,6 +26,8 @@ import '../screens/lists/shared_lists_screen.dart';
 import '../screens/teams/team_dashboard_screen.dart';
 import '../screens/templates/templates_screen.dart';
 import '../screens/automations/automations_screen.dart';
+import '../screens/ai/ai_camera_capture_screen.dart';
+import '../screens/ai/ai_task_review_screen.dart';
 import 'main_scaffold.dart';
 
 /// App router configuration using GoRouter with authentication
@@ -65,6 +67,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/onboarding',
         name: 'onboarding',
         builder: (context, state) => const OnboardingScreen(),
+      ),
+
+      // AI Task Review (full-screen)
+      GoRoute(
+        path: '/ai-review',
+        name: 'ai-review',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          return AiTaskReviewScreen(
+            imagePath: extra['imagePath'] as String,
+            mode: extra['mode'] as ExtractionMode,
+          );
+        },
       ),
 
       // Main app routes with bottom navigation
@@ -233,6 +248,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             name: 'automations',
             pageBuilder: (context, state) => const NoTransitionPage(
               child: AutomationsScreen(),
+            ),
+          ),
+
+          // AI Camera Capture (Flagship Feature!)
+          GoRoute(
+            path: '/ai-camera',
+            name: 'ai-camera',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: AiCameraCaptureScreen(),
             ),
           ),
 
