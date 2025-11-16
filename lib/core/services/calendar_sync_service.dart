@@ -2,17 +2,22 @@ import '../../domain/entities/calendar_integration.dart';
 import '../../domain/entities/task_entity.dart';
 import '../utils/logger.dart';
 import 'google_calendar_service.dart';
+import 'outlook_calendar_service.dart';
 
 /// Calendar Sync Service
 ///
 /// Handles two-way synchronization between tasks and calendar events
+/// Supports multiple calendar providers (Google, Outlook, Apple)
 class CalendarSyncService {
   final GoogleCalendarService _googleCalendarService;
+  final OutlookCalendarService _outlookCalendarService;
   final _logger = Logger();
 
   CalendarSyncService({
     required GoogleCalendarService googleCalendarService,
-  }) : _googleCalendarService = googleCalendarService;
+    required OutlookCalendarService outlookCalendarService,
+  })  : _googleCalendarService = googleCalendarService,
+        _outlookCalendarService = outlookCalendarService;
 
   /// Perform full sync
   Future<CalendarSyncResult> performSync({
@@ -115,7 +120,9 @@ class CalendarSyncService {
       // Fetch events from each selected calendar
       for (final calendarId in integration.selectedCalendarIds) {
         try {
-          final events = await _googleCalendarService.fetchEvents(
+          // Use appropriate service based on provider
+          final events = await _fetchEventsFromProvider(
+            provider: integration.provider,
             accessToken: integration.accessToken!,
             calendarId: calendarId,
             startDate: DateTime.now().subtract(const Duration(days: 30)),
@@ -187,7 +194,8 @@ class CalendarSyncService {
           // Check if task already has a linked event
           if (task.calendarEventId != null) {
             // Update existing event
-            await _googleCalendarService.updateEvent(
+            await _updateEventInProvider(
+              provider: integration.provider,
               accessToken: integration.accessToken!,
               calendarId: calendarId,
               eventId: task.calendarEventId!,
@@ -200,7 +208,8 @@ class CalendarSyncService {
             eventsUpdated++;
           } else if (task.scheduledStartTime != null) {
             // Create new event for scheduled task
-            await _googleCalendarService.createEvent(
+            await _createEventInProvider(
+              provider: integration.provider,
               accessToken: integration.accessToken!,
               calendarId: calendarId,
               title: task.title,
@@ -335,5 +344,116 @@ class CalendarSyncService {
       'calendarEventId': event.id,
       'tags': ['from-calendar'],
     };
+  }
+
+  /// Fetch events from the appropriate provider
+  Future<List<CalendarEvent>> _fetchEventsFromProvider({
+    required CalendarProvider provider,
+    required String accessToken,
+    required String calendarId,
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    switch (provider) {
+      case CalendarProvider.google:
+        return await _googleCalendarService.fetchEvents(
+          accessToken: accessToken,
+          calendarId: calendarId,
+          startDate: startDate,
+          endDate: endDate,
+        );
+      case CalendarProvider.outlook:
+        return await _outlookCalendarService.fetchEvents(
+          accessToken: accessToken,
+          calendarId: calendarId,
+          startDate: startDate,
+          endDate: endDate,
+        );
+      case CalendarProvider.apple:
+      case CalendarProvider.other:
+        throw UnimplementedError('Provider $provider not yet supported');
+    }
+  }
+
+  /// Create event in the appropriate provider
+  Future<CalendarEvent> _createEventInProvider({
+    required CalendarProvider provider,
+    required String accessToken,
+    required String calendarId,
+    required String title,
+    String? description,
+    required DateTime startTime,
+    required DateTime endTime,
+    bool isAllDay = false,
+    String? location,
+    List<String>? attendees,
+  }) async {
+    switch (provider) {
+      case CalendarProvider.google:
+        return await _googleCalendarService.createEvent(
+          accessToken: accessToken,
+          calendarId: calendarId,
+          title: title,
+          description: description,
+          startTime: startTime,
+          endTime: endTime,
+          isAllDay: isAllDay,
+          location: location,
+          attendees: attendees,
+        );
+      case CalendarProvider.outlook:
+        return await _outlookCalendarService.createEvent(
+          accessToken: accessToken,
+          calendarId: calendarId,
+          title: title,
+          description: description,
+          startTime: startTime,
+          endTime: endTime,
+          isAllDay: isAllDay,
+          location: location,
+          attendees: attendees,
+        );
+      case CalendarProvider.apple:
+      case CalendarProvider.other:
+        throw UnimplementedError('Provider $provider not yet supported');
+    }
+  }
+
+  /// Update event in the appropriate provider
+  Future<CalendarEvent> _updateEventInProvider({
+    required CalendarProvider provider,
+    required String accessToken,
+    required String calendarId,
+    required String eventId,
+    String? title,
+    String? description,
+    DateTime? startTime,
+    DateTime? endTime,
+  }) async {
+    switch (provider) {
+      case CalendarProvider.google:
+        return await _googleCalendarService.updateEvent(
+          accessToken: accessToken,
+          calendarId: calendarId,
+          eventId: eventId,
+          title: title,
+          description: description,
+          startTime: startTime,
+          endTime: endTime,
+        );
+      case CalendarProvider.outlook:
+        return await _outlookCalendarService.updateEvent(
+          accessToken: accessToken,
+          calendarId: calendarId,
+          eventId: eventId,
+          title: title,
+          description: description,
+          startTime: startTime,
+          endTime: endTime,
+        );
+      case CalendarProvider.apple:
+      case CalendarProvider.other:
+        throw UnimplementedError('Provider $provider not yet supported');
+    }
   }
 }
