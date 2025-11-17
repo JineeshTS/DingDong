@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_constants.dart';
+import '../../providers/auth/auth.dart';
 
-/// Registration screen
-class RegisterScreen extends StatefulWidget {
+/// Registration screen with Riverpod integration
+class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -19,7 +21,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
-  bool _isLoading = false;
   bool _acceptedTerms = false;
 
   @override
@@ -38,26 +39,49 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please accept the Terms of Service and Privacy Policy'),
+          backgroundColor: Colors.orange,
+          behavior: SnackBarBehavior.floating,
         ),
       );
       return;
     }
 
-    setState(() => _isLoading = true);
+    final authNotifier = ref.read(authNotifierProvider.notifier);
 
-    // TODO: Implement actual registration logic
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (!mounted) return;
-
-    setState(() => _isLoading = false);
-
-    // TODO: Navigate to home or onboarding on successful registration
-    context.go('/home');
+    await authNotifier.signUpWithEmail(
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+      displayName: _nameController.text.trim(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    // Watch auth state for loading indicator
+    final authState = ref.watch(authNotifierProvider);
+    final isLoading = authState.isLoading;
+
+    // Listen to auth state changes for navigation and error handling
+    ref.listen<AuthState>(authNotifierProvider, (previous, next) {
+      next.maybeWhen(
+        authenticated: (user) {
+          // Navigate to home on successful registration
+          context.go('/home');
+        },
+        error: (failure, _) {
+          // Show error message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(failure.message),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        },
+        orElse: () {},
+      );
+    });
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -230,10 +254,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 24),
                 // Register button
                 ElevatedButton(
-                  onPressed: _isLoading ? null : _handleRegister,
+                  onPressed: isLoading ? null : _handleRegister,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    child: _isLoading
+                    child: isLoading
                         ? const SizedBox(
                             height: 20,
                             width: 20,

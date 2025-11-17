@@ -6,12 +6,17 @@ import '../screens/auth/splash_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/register_screen.dart';
 import '../screens/tasks/task_list_screen.dart';
+import '../providers/auth/auth.dart';
 
 /// App router configuration using GoRouter
 final appRouterProvider = Provider<GoRouter>((ref) {
+  // Watch auth state for router redirects
+  final authState = ref.watch(authNotifierProvider);
+
   return GoRouter(
     initialLocation: '/',
     debugLogDiagnostics: true,
+    refreshListenable: _AuthStateNotifier(ref),
     routes: [
       // Splash screen
       GoRoute(
@@ -96,12 +101,44 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
     ),
 
-    // Redirect logic (will be implemented with authentication)
+    // Redirect logic based on authentication
     redirect: (context, state) {
-      // TODO: Implement authentication-based redirects
-      // - If not authenticated and not on auth pages, redirect to login
-      // - If authenticated and on auth pages, redirect to home
-      return null; // No redirect for now
+      final isAuthenticated = authState.isAuthenticated;
+      final isLoading = authState.isLoading;
+
+      // List of public routes that don't require authentication
+      final publicRoutes = ['/', '/login', '/register'];
+      final isPublicRoute = publicRoutes.contains(state.matchedLocation);
+
+      // Don't redirect while loading
+      if (isLoading) {
+        return null;
+      }
+
+      // If not authenticated and trying to access protected route, redirect to login
+      if (!isAuthenticated && !isPublicRoute) {
+        return '/login';
+      }
+
+      // If authenticated and on auth pages, redirect to home
+      if (isAuthenticated && (state.matchedLocation == '/login' ||
+          state.matchedLocation == '/register')) {
+        return '/home';
+      }
+
+      // No redirect needed
+      return null;
     },
   );
 });
+
+/// Helper class to notify router of auth state changes
+class _AuthStateNotifier extends ChangeNotifier {
+  final Ref ref;
+
+  _AuthStateNotifier(this.ref) {
+    ref.listen<AuthState>(authNotifierProvider, (previous, next) {
+      notifyListeners();
+    });
+  }
+}

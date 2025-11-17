@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_constants.dart';
+import '../../providers/auth/auth.dart';
 
-/// Login screen
-class LoginScreen extends StatefulWidget {
+/// Login screen with Riverpod integration
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -28,33 +29,56 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
-    setState(() => _isLoading = true);
+    final authNotifier = ref.read(authNotifierProvider.notifier);
 
-    // TODO: Implement actual login logic
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (!mounted) return;
-
-    setState(() => _isLoading = false);
-
-    // TODO: Navigate to home on successful login
-    context.go('/home');
+    await authNotifier.signInWithEmail(
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+    );
   }
 
   Future<void> _handleGoogleSignIn() async {
-    // TODO: Implement Google Sign In
+    final authNotifier = ref.read(authNotifierProvider.notifier);
+    await authNotifier.signInWithGoogle();
   }
 
   Future<void> _handleAppleSignIn() async {
-    // TODO: Implement Apple Sign In
+    final authNotifier = ref.read(authNotifierProvider.notifier);
+    await authNotifier.signInWithApple();
   }
 
   Future<void> _handleMicrosoftSignIn() async {
-    // TODO: Implement Microsoft Sign In
+    final authNotifier = ref.read(authNotifierProvider.notifier);
+    await authNotifier.signInWithMicrosoft();
   }
 
   @override
   Widget build(BuildContext context) {
+    // Watch auth state for loading indicator
+    final authState = ref.watch(authNotifierProvider);
+    final isLoading = authState.isLoading;
+
+    // Listen to auth state changes for navigation and error handling
+    ref.listen<AuthState>(authNotifierProvider, (previous, next) {
+      next.maybeWhen(
+        authenticated: (user) {
+          // Navigate to home on successful authentication
+          context.go('/home');
+        },
+        error: (failure, _) {
+          // Show error message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(failure.message),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        },
+        orElse: () {},
+      );
+    });
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -150,10 +174,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 24),
                 // Login button
                 ElevatedButton(
-                  onPressed: _isLoading ? null : _handleLogin,
+                  onPressed: isLoading ? null : _handleLogin,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    child: _isLoading
+                    child: isLoading
                         ? const SizedBox(
                             height: 20,
                             width: 20,
