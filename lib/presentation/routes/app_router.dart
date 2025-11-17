@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../screens/auth/splash_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/register_screen.dart';
-import '../screens/tasks/task_list_screen.dart';
+import '../screens/home/home_screen.dart';
 import '../providers/auth/auth.dart';
 
 /// App router configuration using GoRouter
@@ -41,7 +41,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/home',
         name: 'home',
-        builder: (context, state) => const TaskListScreen(),
+        builder: (context, state) => const HomeScreen(),
       ),
 
       // Task routes
