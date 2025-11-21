@@ -20,4 +20,5 @@
 export 'analytics_service.dart';
 export 'crash_reporting_service.dart';
 export 'remote_config_service.dart';
+export 'timebox_service.dart';
 export 'version_service.dart';
