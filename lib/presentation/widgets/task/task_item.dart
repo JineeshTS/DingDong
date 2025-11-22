@@ -37,8 +37,10 @@ class TaskItem extends StatelessWidget {
     return AppColors.getPriorityColor(task.priority.index);
   }
 
+  bool get _isCompleted => task.status == TaskStatus.completed;
+
   bool get _isOverdue {
-    if (task.isCompleted || task.dueDate == null) return false;
+    if (_isCompleted || task.dueDate == null) return false;
     return task.dueDate!.isBefore(DateTime.now());
   }
 
@@ -55,16 +57,6 @@ class TaskItem extends StatelessWidget {
     );
 
     if (dueDate == today) {
-      if (task.dueTime != null) {
-        final time = DateTime(
-          now.year,
-          now.month,
-          now.day,
-          task.dueTime!.inHours,
-          task.dueTime!.inMinutes % 60,
-        );
-        return 'Today, ${DateFormat.jm().format(time)}';
-      }
       return 'Today';
     } else if (dueDate == tomorrow) {
       return 'Tomorrow';
@@ -82,7 +74,7 @@ class TaskItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = task.isCompleted
+    final textColor = _isCompleted
         ? (isDark ? AppColors.textTertiaryDark : AppColors.textTertiaryLight)
         : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight);
     final subtitleColor = isDark
@@ -105,7 +97,7 @@ class TaskItem extends StatelessWidget {
           children: [
             // Checkbox
             _TaskCheckbox(
-              isCompleted: task.isCompleted,
+              isCompleted: _isCompleted,
               priority: task.priority,
               onChanged: (value) {
                 if (value == true) {
@@ -128,7 +120,7 @@ class TaskItem extends StatelessWidget {
                     task.title,
                     style: AppTypography.taskTitle(
                       color: textColor,
-                      completed: task.isCompleted,
+                      completed: _isCompleted,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -147,13 +139,10 @@ class TaskItem extends StatelessWidget {
 
                   // Metadata row
                   if (showDueDate && task.dueDate != null ||
-                      showListName ||
-                      showTags && task.tags.isNotEmpty ||
-                      task.subtasks.isNotEmpty) ...[
+                      showTags && task.tags.isNotEmpty) ...[
                     const SizedBox(height: AppSpacing.sm),
                     _TaskMetadataRow(
                       task: task,
-                      showListName: showListName,
                       showDueDate: showDueDate,
                       showTags: showTags,
                       isOverdue: _isOverdue,
@@ -211,10 +200,9 @@ class _TaskCheckbox extends StatelessWidget {
   }
 }
 
-/// Task metadata row (due date, tags, subtasks count)
+/// Task metadata row (due date, tags)
 class _TaskMetadataRow extends StatelessWidget {
   final TaskEntity task;
-  final bool showListName;
   final bool showDueDate;
   final bool showTags;
   final bool isOverdue;
@@ -222,7 +210,6 @@ class _TaskMetadataRow extends StatelessWidget {
 
   const _TaskMetadataRow({
     required this.task,
-    required this.showListName,
     required this.showDueDate,
     required this.showTags,
     required this.isOverdue,
@@ -262,55 +249,21 @@ class _TaskMetadataRow extends StatelessWidget {
             ],
           ),
 
-        // Subtasks count
-        if (task.subtasks.isNotEmpty)
+        // Location indicator
+        if (task.location != null && task.location!.isNotEmpty)
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
-                Icons.checklist,
+                Icons.location_on_outlined,
                 size: 14,
                 color: subtitleColor,
               ),
               const SizedBox(width: 4),
               Text(
-                '${task.completedSubtaskCount}/${task.subtasks.length}',
-                style: AppTypography.labelSmall(color: subtitleColor),
-              ),
-            ],
-          ),
-
-        // Attachments count
-        if (task.attachmentIds.isNotEmpty)
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.attach_file,
-                size: 14,
-                color: subtitleColor,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                '${task.attachmentIds.length}',
-                style: AppTypography.labelSmall(color: subtitleColor),
-              ),
-            ],
-          ),
-
-        // Comments count
-        if (task.commentCount > 0)
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.chat_bubble_outline,
-                size: 14,
-                color: subtitleColor,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                '${task.commentCount}',
+                task.location!.length > 15
+                    ? '${task.location!.substring(0, 15)}...'
+                    : task.location!,
                 style: AppTypography.labelSmall(color: subtitleColor),
               ),
             ],
@@ -409,10 +362,12 @@ class CompactTaskItem extends StatelessWidget {
     this.onComplete,
   });
 
+  bool get _isCompleted => task.status == TaskStatus.completed;
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = task.isCompleted
+    final textColor = _isCompleted
         ? (isDark ? AppColors.textTertiaryDark : AppColors.textTertiaryLight)
         : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight);
 
@@ -427,7 +382,7 @@ class CompactTaskItem extends StatelessWidget {
         child: Row(
           children: [
             _TaskCheckbox(
-              isCompleted: task.isCompleted,
+              isCompleted: _isCompleted,
               priority: task.priority,
               onChanged: (_) => onComplete?.call(),
             ),
@@ -436,7 +391,7 @@ class CompactTaskItem extends StatelessWidget {
               child: Text(
                 task.title,
                 style: AppTypography.bodyMedium(color: textColor).copyWith(
-                  decoration: task.isCompleted ? TextDecoration.lineThrough : null,
+                  decoration: _isCompleted ? TextDecoration.lineThrough : null,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

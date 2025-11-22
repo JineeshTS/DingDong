@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_spacing.dart';
@@ -201,9 +201,14 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
                     Navigator.pop(context);
                     final userId = ref.read(currentUserProvider)?.id;
                     if (userId != null) {
-                      final task = TaskEntity.create(
-                        title: value.trim(),
+                      final now = DateTime.now();
+                      final task = TaskEntity(
+                        id: const Uuid().v4(),
                         userId: userId,
+                        title: value.trim(),
+                        createdAt: now,
+                        updatedAt: now,
+                        createdBy: userId,
                       );
                       await ref
                           .read(taskNotifierProvider.notifier)
@@ -246,9 +251,14 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
                         Navigator.pop(context);
                         final userId = ref.read(currentUserProvider)?.id;
                         if (userId != null) {
-                          final task = TaskEntity.create(
-                            title: value.trim(),
+                          final now = DateTime.now();
+                          final task = TaskEntity(
+                            id: const Uuid().v4(),
                             userId: userId,
+                            title: value.trim(),
+                            createdAt: now,
+                            updatedAt: now,
+                            createdBy: userId,
                           );
                           await ref
                               .read(taskNotifierProvider.notifier)
