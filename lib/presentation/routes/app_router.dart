@@ -7,6 +7,10 @@ import '../screens/auth/forgot_password_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/register_screen.dart';
 import '../screens/auth/splash_screen.dart';
+import '../screens/lists/list_detail_screen.dart';
+import '../screens/lists/lists_screen.dart';
+import '../screens/tasks/task_detail_screen.dart';
+import '../screens/tasks/task_edit_screen.dart';
 import '../screens/tasks/task_list_screen.dart';
 
 /// App router configuration using GoRouter
@@ -50,7 +54,42 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
 
       // Task routes
-      // TODO: Add task detail, create, edit routes
+      GoRoute(
+        path: '/task/:id',
+        name: 'task-detail',
+        builder: (context, state) {
+          final taskId = state.pathParameters['id']!;
+          return TaskDetailScreen(taskId: taskId);
+        },
+      ),
+      GoRoute(
+        path: '/task/:id/edit',
+        name: 'task-edit',
+        builder: (context, state) {
+          final taskId = state.pathParameters['id']!;
+          return TaskEditScreen(taskId: taskId);
+        },
+      ),
+      GoRoute(
+        path: '/task/create',
+        name: 'task-create',
+        builder: (context, state) => const TaskEditScreen(),
+      ),
+
+      // Lists routes
+      GoRoute(
+        path: '/lists',
+        name: 'lists',
+        builder: (context, state) => const ListsScreen(),
+      ),
+      GoRoute(
+        path: '/list/:id',
+        name: 'list-detail',
+        builder: (context, state) {
+          final listId = state.pathParameters['id']!;
+          return ListDetailScreen(listId: listId);
+        },
+      ),
 
       // Calendar routes
       // TODO: Add calendar routes

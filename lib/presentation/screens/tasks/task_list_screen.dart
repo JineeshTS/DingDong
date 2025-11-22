@@ -147,8 +147,7 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
   }
 
   void _onTaskTap(TaskEntity task) {
-    // TODO: Navigate to task detail
-    // context.push('/task/${task.id}');
+    context.push('/task/${task.id}');
   }
 
   Future<void> _onTaskComplete(TaskEntity task) async {
@@ -163,9 +162,11 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
   }
 
   void _onCreateTask() {
-    // TODO: Navigate to create task screen
-    // context.push('/task/create');
     _showQuickAddTaskSheet();
+  }
+
+  void _onCreateTaskFull() {
+    context.push('/task/create');
   }
 
   void _showQuickAddTaskSheet() {
