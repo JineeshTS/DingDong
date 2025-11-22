@@ -382,19 +382,24 @@ class AuthRepositoryImpl implements AuthRepository {
       ..subscriptionTier = _subscriptionTierToIsar(model.subscriptionTier)
       ..subscriptionExpiresAt = model.subscriptionExpiresAt
       ..preferences = model.preferences != null
-          ? UserPreferencesIsar()
-            ..theme = model.preferences!.theme
-            ..locale = model.preferences!.locale
-            ..defaultListId = model.preferences!.defaultListId
-            ..enableNotifications = model.preferences!.enableNotifications
-            ..enableSounds = model.preferences!.enableSounds
-            ..enableVibration = model.preferences!.enableVibration
+          ? _convertPreferencesToIsar(model.preferences!)
           : null
       ..createdAt = model.createdAt
       ..updatedAt = model.updatedAt
       ..lastActive = model.lastActive
       ..isActive = model.isActive
       ..isDeactivated = model.isDeactivated;
+  }
+
+  /// Helper to convert preferences to Isar
+  UserPreferencesIsar _convertPreferencesToIsar(UserPreferences prefs) {
+    return UserPreferencesIsar()
+      ..theme = prefs.theme
+      ..locale = prefs.locale
+      ..defaultListId = prefs.defaultListId
+      ..enableNotifications = prefs.enableNotifications
+      ..enableSounds = prefs.enableSounds
+      ..enableVibration = prefs.enableVibration;
   }
 
   /// Convert UserIsar to UserEntity
