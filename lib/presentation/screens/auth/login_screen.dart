@@ -24,13 +24,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
     super.dispose();
   }
 
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
-    setState(() => _isLoading = true);
+    // Clear any previous errors
+    ref.read(authNotifierProvider.notifier).clearError();
 
     final result = await ref.read(authNotifierProvider.notifier).signInWithEmail(
           _emailController.text.trim(),
@@ -126,6 +129,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authNotifierProvider);
+    final isLoading = authState.isLoading;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Listen for auth state changes
+    ref.listen<AuthState>(authNotifierProvider, (previous, next) {
+      // Navigate to home on successful authentication
+      if (next.isAuthenticated) {
+        context.go('/home');
+      }
+      // Show error snackbar
+      if (next.hasError && next.errorOrNull != null) {
+        ErrorSnackBar.show(
+          context,
+          message: next.errorOrNull!.message,
+          onRetry: () => ref.read(authNotifierProvider.notifier).clearError(),
+        );
+      }
+    });
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -287,11 +310,37 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Social login button widget
+class _SocialLoginButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback? onPressed;
+  final bool isLoading;
+
+  const _SocialLoginButton({
+    required this.icon,
+    required this.label,
+    this.onPressed,
+    this.isLoading = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AppButton.outlined(
+      label: label,
+      leadingIcon: isLoading ? null : icon,
+      onPressed: onPressed,
+      isLoading: isLoading,
+      isExpanded: true,
     );
   }
 }

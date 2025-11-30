@@ -25,12 +25,27 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   bool _acceptedTerms = false;
 
   @override
+  void initState() {
+    super.initState();
+    _passwordController.addListener(_updatePasswordRequirements);
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
+    _passwordController.removeListener(_updatePasswordRequirements);
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _nameFocusNode.dispose();
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    _confirmPasswordFocusNode.dispose();
     super.dispose();
+  }
+
+  void _updatePasswordRequirements() {
+    setState(() {});
   }
 
   Future<void> _handleRegister() async {
@@ -46,7 +61,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       return;
     }
 
-    setState(() => _isLoading = true);
+    ref.read(authNotifierProvider.notifier).clearError();
 
     final result = await ref.read(authNotifierProvider.notifier).signUp(
           email: _emailController.text.trim(),
@@ -54,9 +69,25 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           displayName: _nameController.text.trim(),
         );
 
-    if (!mounted) return;
+  String? _validateName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your name';
+    }
+    if (value.length < 2) {
+      return 'Name must be at least 2 characters';
+    }
+    return null;
+  }
 
-    setState(() => _isLoading = false);
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your email';
+    }
+    if (!RegExp(AppConstants.emailPattern).hasMatch(value)) {
+      return 'Please enter a valid email';
+    }
+    return null;
+  }
 
     result.fold(
       (failure) {
@@ -76,12 +107,32 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authNotifierProvider);
+    final isLoading = authState.isLoading;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    ref.listen<AuthState>(authNotifierProvider, (previous, next) {
+      if (next.isAuthenticated) {
+        context.go('/home');
+      }
+      if (next.hasError && next.errorOrNull != null) {
+        ErrorSnackBar.show(
+          context,
+          message: next.errorOrNull!.message,
+          onRetry: () => ref.read(authNotifierProvider.notifier).clearError(),
+        );
+      }
+    });
+
     return Scaffold(
       appBar: AppBar(
         leading: AppIconButton(
           icon: Icons.arrow_back,
           onPressed: () => context.pop(),
         ),
+        title: const Text('Create Account'),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -267,10 +318,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                     // TODO: Navigate to Privacy Policy
                                   },
                               ),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
                   ],
                 ),
@@ -320,7 +371,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
@@ -343,6 +394,81 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             text,
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.gray700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Password requirements checklist
+class _PasswordRequirements extends StatelessWidget {
+  final String password;
+
+  const _PasswordRequirements({required this.password});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? AppColors.textTertiaryDark : AppColors.textTertiaryLight;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _RequirementItem(
+          text: 'At least 8 characters',
+          isMet: password.length >= 8,
+          textColor: textColor,
+        ),
+        _RequirementItem(
+          text: 'One uppercase letter',
+          isMet: RegExp(r'[A-Z]').hasMatch(password),
+          textColor: textColor,
+        ),
+        _RequirementItem(
+          text: 'One lowercase letter',
+          isMet: RegExp(r'[a-z]').hasMatch(password),
+          textColor: textColor,
+        ),
+        _RequirementItem(
+          text: 'One number',
+          isMet: RegExp(r'[0-9]').hasMatch(password),
+          textColor: textColor,
+        ),
+      ],
+    );
+  }
+}
+
+class _RequirementItem extends StatelessWidget {
+  final String text;
+  final bool isMet;
+  final Color textColor;
+
+  const _RequirementItem({
+    required this.text,
+    required this.isMet,
+    required this.textColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: Row(
+        children: [
+          Icon(
+            isMet ? Icons.check_circle : Icons.circle_outlined,
+            size: 14,
+            color: isMet ? AppColors.success : textColor,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 12,
+              color: isMet ? AppColors.success : textColor,
             ),
           ),
         ],

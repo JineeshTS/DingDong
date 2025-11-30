@@ -27,6 +27,9 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final taskState = ref.watch(taskNotifierProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(_getTitle()),
@@ -122,7 +125,7 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
               child: const Text('Create Your First Task'),
             ),
           ],
-        ),
+        ],
       ),
     );
   }
