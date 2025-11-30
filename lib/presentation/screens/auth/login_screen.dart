@@ -2,16 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../config/theme/app_colors.dart';
-import '../../../config/theme/app_spacing.dart';
-import '../../../core/constants/app_constants.dart';
-import '../../providers/auth/auth_providers.dart';
-import '../../providers/auth/auth_state.dart';
-import '../../widgets/common/app_button.dart';
-import '../../widgets/common/app_text_field.dart';
-import '../../widgets/common/error_state.dart';
+import '../../../config/theme/design_system.dart';
+import '../../common/widgets/widgets.dart';
+import '../../providers/auth_provider.dart';
 
-/// Login screen with email and social authentication
+/// Enhanced login screen using design system
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -23,8 +18,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _emailFocusNode = FocusNode();
-  final _passwordFocusNode = FocusNode();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -41,49 +35,96 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     // Clear any previous errors
     ref.read(authNotifierProvider.notifier).clearError();
 
-    await ref.read(authNotifierProvider.notifier).signInWithEmail(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
+    final result = await ref.read(authNotifierProvider.notifier).signInWithEmail(
+          _emailController.text.trim(),
+          _passwordController.text,
         );
+
+    if (!mounted) return;
+
+    setState(() => _isLoading = false);
+
+    result.fold(
+      (failure) {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(failure.message),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      },
+      (user) {
+        // Navigate to home on success
+        context.go('/home');
+      },
+    );
   }
 
   Future<void> _handleGoogleSignIn() async {
-    ref.read(authNotifierProvider.notifier).clearError();
-    await ref.read(authNotifierProvider.notifier).signInWithGoogle();
+    setState(() => _isLoading = true);
+
+    final result = await ref.read(authNotifierProvider.notifier).signInWithGoogle();
+
+    if (!mounted) return;
+
+    setState(() => _isLoading = false);
+
+    result.fold(
+      (failure) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(failure.message),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      },
+      (user) => context.go('/home'),
+    );
   }
 
   Future<void> _handleAppleSignIn() async {
-    ref.read(authNotifierProvider.notifier).clearError();
-    await ref.read(authNotifierProvider.notifier).signInWithApple();
+    setState(() => _isLoading = true);
+
+    final result = await ref.read(authNotifierProvider.notifier).signInWithApple();
+
+    if (!mounted) return;
+
+    setState(() => _isLoading = false);
+
+    result.fold(
+      (failure) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(failure.message),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      },
+      (user) => context.go('/home'),
+    );
   }
 
   Future<void> _handleMicrosoftSignIn() async {
-    ref.read(authNotifierProvider.notifier).clearError();
-    await ref.read(authNotifierProvider.notifier).signInWithMicrosoft();
-  }
+    setState(() => _isLoading = true);
 
-  void _navigateToForgotPassword() {
-    context.push('/forgot-password');
-  }
+    final result = await ref.read(authNotifierProvider.notifier).signInWithMicrosoft();
 
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your email';
-    }
-    if (!RegExp(AppConstants.emailPattern).hasMatch(value)) {
-      return 'Please enter a valid email';
-    }
-    return null;
-  }
+    if (!mounted) return;
 
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your password';
-    }
-    if (value.length < 6) {
-      return 'Password must be at least 6 characters';
-    }
-    return null;
+    setState(() => _isLoading = false);
+
+    result.fold(
+      (failure) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(failure.message),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      },
+      (user) => context.go('/home'),
+    );
   }
 
   @override
@@ -110,159 +151,162 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     return Scaffold(
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 400),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisAlignment: MainAxisAlignment.center,
+        child: SingleChildScrollView(
+          padding: AppSpacing.pagePadding,
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                AppSpacing.verticalSpaceXXL,
+
+                // App logo
+                Icon(
+                  Icons.task_alt,
+                  size: AppSpacing.iconXXL + 16,
+                  color: AppColors.primary,
+                ),
+                AppSpacing.verticalSpaceXL,
+
+                // Welcome text
+                Text(
+                  'Welcome Back!',
+                  style: AppTypography.headlineLarge,
+                  textAlign: TextAlign.center,
+                ),
+                AppSpacing.verticalSpaceXS,
+                Text(
+                  'Sign in to continue to DingDong',
+                  style: AppTypography.bodyLarge.copyWith(
+                    color: AppColors.gray600,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                AppSpacing.verticalSpaceXXL,
+
+                // Email field
+                AppTextField(
+                  controller: _emailController,
+                  label: 'Email',
+                  hint: 'Enter your email',
+                  keyboardType: TextInputType.emailAddress,
+                  prefixIcon: const Icon(Icons.email_outlined),
+                  textInputAction: TextInputAction.next,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your email';
+                    }
+                    if (!AppConstants.emailRegex.hasMatch(value)) {
+                      return 'Please enter a valid email';
+                    }
+                    return null;
+                  },
+                ),
+                AppSpacing.verticalSpaceMD,
+
+                // Password field
+                AppPasswordField(
+                  controller: _passwordController,
+                  label: 'Password',
+                  hint: 'Enter your password',
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (_) => _handleLogin(),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your password';
+                    }
+                    if (value.length < 6) {
+                      return 'Password must be at least 6 characters';
+                    }
+                    return null;
+                  },
+                ),
+                AppSpacing.verticalSpaceXS,
+
+                // Forgot password
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: AppButton(
+                    onPressed: () => context.push('/forgot-password'),
+                    variant: AppButtonVariant.text,
+                    size: AppButtonSize.small,
+                    child: const Text('Forgot Password?'),
+                  ),
+                ),
+                AppSpacing.verticalSpaceXL,
+
+                // Login button
+                AppButton(
+                  onPressed: _handleLogin,
+                  fullWidth: true,
+                  loading: _isLoading,
+                  enabled: !_isLoading,
+                  child: const Text('Sign In'),
+                ),
+                AppSpacing.verticalSpaceXL,
+
+                // Divider
+                Row(
                   children: [
-                    // App logo
-                    Icon(
-                      Icons.task_alt,
-                      size: 80,
-                      color: AppColors.primary,
-                    ),
-                    Gap.v24,
-
-                    // Welcome text
-                    Text(
-                      'Welcome Back!',
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                      textAlign: TextAlign.center,
-                    ),
-                    Gap.v8,
-                    Text(
-                      'Sign in to continue',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: isDark
-                                ? AppColors.textSecondaryDark
-                                : AppColors.textSecondaryLight,
-                          ),
-                      textAlign: TextAlign.center,
-                    ),
-                    Gap.v32,
-
-                    // Email field
-                    AppTextField.email(
-                      controller: _emailController,
-                      focusNode: _emailFocusNode,
-                      validator: _validateEmail,
-                      enabled: !isLoading,
-                      onSubmitted: (_) {
-                        _passwordFocusNode.requestFocus();
-                      },
-                    ),
-                    Gap.v16,
-
-                    // Password field
-                    AppTextField.password(
-                      controller: _passwordController,
-                      focusNode: _passwordFocusNode,
-                      validator: _validatePassword,
-                      enabled: !isLoading,
-                      onSubmitted: (_) => _handleLogin(),
-                    ),
-                    Gap.v8,
-
-                    // Forgot password
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: isLoading ? null : _navigateToForgotPassword,
-                        child: const Text('Forgot Password?'),
+                    const Expanded(child: Divider(color: AppColors.gray300)),
+                    Padding(
+                      padding: AppSpacing.horizontalMD,
+                      child: Text(
+                        'OR CONTINUE WITH',
+                        style: AppTypography.labelSmall.copyWith(
+                          color: AppColors.gray600,
+                        ),
                       ),
                     ),
-                    Gap.v24,
+                    const Expanded(child: Divider(color: AppColors.gray300)),
+                  ],
+                ),
+                AppSpacing.verticalSpaceXL,
 
-                    // Login button
-                    AppButton.primary(
-                      label: 'Sign In',
-                      onPressed: isLoading ? null : _handleLogin,
-                      isLoading: isLoading && authState.loadingMessageOrNull == 'Signing in...',
-                      isExpanded: true,
-                      size: AppButtonSize.large,
+                // Social sign-in buttons
+                AppButton(
+                  onPressed: _handleGoogleSignIn,
+                  variant: AppButtonVariant.outlined,
+                  fullWidth: true,
+                  enabled: !_isLoading,
+                  icon: Icons.g_mobiledata,
+                  child: const Text('Continue with Google'),
+                ),
+                AppSpacing.verticalSpaceSM,
+
+                AppButton(
+                  onPressed: _handleAppleSignIn,
+                  variant: AppButtonVariant.outlined,
+                  fullWidth: true,
+                  enabled: !_isLoading,
+                  icon: Icons.apple,
+                  child: const Text('Continue with Apple'),
+                ),
+                AppSpacing.verticalSpaceSM,
+
+                AppButton(
+                  onPressed: _handleMicrosoftSignIn,
+                  variant: AppButtonVariant.outlined,
+                  fullWidth: true,
+                  enabled: !_isLoading,
+                  icon: Icons.microsoft,
+                  child: const Text('Continue with Microsoft'),
+                ),
+                AppSpacing.verticalSpaceXL,
+
+                // Sign up link
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Don't have an account?",
+                      style: AppTypography.bodyMedium,
                     ),
-                    Gap.v24,
-
-                    // Divider
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Divider(
-                            color: isDark ? AppColors.dividerDark : AppColors.dividerLight,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Text(
-                            'OR',
-                            style: TextStyle(
-                              color: isDark
-                                  ? AppColors.textTertiaryDark
-                                  : AppColors.textTertiaryLight,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Divider(
-                            color: isDark ? AppColors.dividerDark : AppColors.dividerLight,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Gap.v24,
-
-                    // Google Sign In
-                    _SocialLoginButton(
-                      icon: Icons.g_mobiledata,
-                      label: 'Continue with Google',
-                      onPressed: isLoading ? null : _handleGoogleSignIn,
-                      isLoading: isLoading && authState.loadingMessageOrNull == 'Signing in with Google...',
-                    ),
-                    Gap.v12,
-
-                    // Apple Sign In
-                    _SocialLoginButton(
-                      icon: Icons.apple,
-                      label: 'Continue with Apple',
-                      onPressed: isLoading ? null : _handleAppleSignIn,
-                      isLoading: isLoading && authState.loadingMessageOrNull == 'Signing in with Apple...',
-                    ),
-                    Gap.v12,
-
-                    // Microsoft Sign In
-                    _SocialLoginButton(
-                      icon: Icons.microsoft,
-                      label: 'Continue with Microsoft',
-                      onPressed: isLoading ? null : _handleMicrosoftSignIn,
-                      isLoading: isLoading && authState.loadingMessageOrNull == 'Signing in with Microsoft...',
-                    ),
-                    Gap.v24,
-
-                    // Sign up link
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Don't have an account?",
-                          style: TextStyle(
-                            color: isDark
-                                ? AppColors.textSecondaryDark
-                                : AppColors.textSecondaryLight,
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: isLoading ? null : () => context.go('/register'),
-                          child: const Text('Sign Up'),
-                        ),
-                      ],
+                    AppButton(
+                      onPressed: () => context.go('/register'),
+                      variant: AppButtonVariant.text,
+                      size: AppButtonSize.small,
+                      child: const Text('Sign Up'),
                     ),
                   ],
                 ),

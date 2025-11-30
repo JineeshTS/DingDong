@@ -1,0 +1,268 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ============================================================
+    // HELPER FUNCTIONS
+    // ============================================================
+
+    // Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Check if user owns the document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Check if user is a member of a workspace
+    function isWorkspaceMember(workspaceId) {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/workspaces/$(workspaceId)/members/$(request.auth.uid));
+    }
+
+    // Check if user is admin of a workspace
+    function isWorkspaceAdmin(workspaceId) {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/workspaces/$(workspaceId)/members/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Check if list is shared with user
+    function isListSharedWithUser(listData) {
+      return isAuthenticated() &&
+        (listData.ownerId == request.auth.uid ||
+         request.auth.uid in listData.sharedWith);
+    }
+
+    // Validate required fields exist
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    // Validate string field
+    function isValidString(field, minLen, maxLen) {
+      return request.resource.data[field] is string &&
+        request.resource.data[field].size() >= minLen &&
+        request.resource.data[field].size() <= maxLen;
+    }
+
+    // ============================================================
+    // USERS COLLECTION
+    // ============================================================
+
+    match /users/{userId} {
+      // Users can only read/write their own document
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+
+      // User settings subcollection
+      match /settings/{settingId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // User subscriptions subcollection
+      match /subscriptions/{subscriptionId} {
+        allow read: if isOwner(userId);
+        // Only Cloud Functions can write subscriptions
+        allow write: if false;
+      }
+    }
+
+    // ============================================================
+    // TASKS COLLECTION
+    // ============================================================
+
+    match /tasks/{taskId} {
+      // Read: Owner or assigned user or shared via list
+      allow read: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid ||
+        request.auth.uid in resource.data.assignedTo ||
+        (resource.data.listId != null &&
+          isListSharedWithUser(get(/databases/$(database)/documents/lists/$(resource.data.listId)).data))
+      );
+
+      // Create: Authenticated users can create tasks they own
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid &&
+        hasRequiredFields(['title', 'userId', 'createdAt', 'updatedAt']);
+
+      // Update: Owner or assigned user
+      allow update: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid ||
+        request.auth.uid in resource.data.assignedTo
+      );
+
+      // Delete: Only owner
+      allow delete: if isOwner(resource.data.userId);
+
+      // Task comments subcollection
+      match /comments/{commentId} {
+        allow read: if isAuthenticated() && (
+          get(/databases/$(database)/documents/tasks/$(taskId)).data.userId == request.auth.uid ||
+          request.auth.uid in get(/databases/$(database)/documents/tasks/$(taskId)).data.assignedTo
+        );
+        allow create: if isAuthenticated();
+        allow update: if isOwner(resource.data.userId);
+        allow delete: if isOwner(resource.data.userId);
+      }
+
+      // Task attachments subcollection
+      match /attachments/{attachmentId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated();
+        allow delete: if isOwner(resource.data.userId);
+      }
+    }
+
+    // ============================================================
+    // LISTS COLLECTION
+    // ============================================================
+
+    match /lists/{listId} {
+      // Read: Owner or shared with user
+      allow read: if isAuthenticated() && (
+        resource.data.ownerId == request.auth.uid ||
+        request.auth.uid in resource.data.sharedWith
+      );
+
+      // Create: Authenticated users
+      allow create: if isAuthenticated() &&
+        request.resource.data.ownerId == request.auth.uid &&
+        hasRequiredFields(['name', 'ownerId', 'createdAt', 'updatedAt']);
+
+      // Update: Owner only
+      allow update: if isOwner(resource.data.ownerId);
+
+      // Delete: Owner only
+      allow delete: if isOwner(resource.data.ownerId);
+    }
+
+    // ============================================================
+    // TAGS COLLECTION
+    // ============================================================
+
+    match /tags/{tagId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid;
+      allow update: if isOwner(resource.data.userId);
+      allow delete: if isOwner(resource.data.userId);
+    }
+
+    // ============================================================
+    // REMINDERS COLLECTION
+    // ============================================================
+
+    match /reminders/{reminderId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid;
+      allow update: if isOwner(resource.data.userId);
+      allow delete: if isOwner(resource.data.userId);
+    }
+
+    // ============================================================
+    // HABITS COLLECTION
+    // ============================================================
+
+    match /habits/{habitId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid;
+      allow update: if isOwner(resource.data.userId);
+      allow delete: if isOwner(resource.data.userId);
+
+      // Habit completions subcollection
+      match /completions/{completionId} {
+        allow read: if isOwner(get(/databases/$(database)/documents/habits/$(habitId)).data.userId);
+        allow create: if isOwner(get(/databases/$(database)/documents/habits/$(habitId)).data.userId);
+        allow delete: if isOwner(get(/databases/$(database)/documents/habits/$(habitId)).data.userId);
+      }
+    }
+
+    // ============================================================
+    // FOCUS SESSIONS COLLECTION
+    // ============================================================
+
+    match /focusSessions/{sessionId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid;
+      allow update: if isOwner(resource.data.userId);
+      allow delete: if isOwner(resource.data.userId);
+    }
+
+    // ============================================================
+    // WORKSPACES COLLECTION
+    // ============================================================
+
+    match /workspaces/{workspaceId} {
+      // Read: Members only
+      allow read: if isWorkspaceMember(workspaceId);
+
+      // Create: Authenticated users
+      allow create: if isAuthenticated() &&
+        request.resource.data.ownerId == request.auth.uid;
+
+      // Update: Admin only
+      allow update: if isWorkspaceAdmin(workspaceId);
+
+      // Delete: Owner only
+      allow delete: if resource.data.ownerId == request.auth.uid;
+
+      // Workspace members subcollection
+      match /members/{memberId} {
+        allow read: if isWorkspaceMember(workspaceId);
+        allow create: if isWorkspaceAdmin(workspaceId);
+        allow update: if isWorkspaceAdmin(workspaceId);
+        allow delete: if isWorkspaceAdmin(workspaceId) || memberId == request.auth.uid;
+      }
+
+      // Workspace invitations subcollection
+      match /invitations/{invitationId} {
+        allow read: if isWorkspaceMember(workspaceId) ||
+          resource.data.email == request.auth.token.email;
+        allow create: if isWorkspaceAdmin(workspaceId);
+        allow update: if isWorkspaceAdmin(workspaceId) ||
+          resource.data.email == request.auth.token.email;
+        allow delete: if isWorkspaceAdmin(workspaceId);
+      }
+    }
+
+    // ============================================================
+    // INTEGRATIONS COLLECTION
+    // ============================================================
+
+    match /integrations/{integrationId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid;
+      allow update: if isOwner(resource.data.userId);
+      allow delete: if isOwner(resource.data.userId);
+    }
+
+    // ============================================================
+    // ACTIVITY LOG COLLECTION (Read-only)
+    // ============================================================
+
+    match /activityLogs/{logId} {
+      allow read: if isOwner(resource.data.userId) ||
+        (resource.data.workspaceId != null && isWorkspaceMember(resource.data.workspaceId));
+      // Only Cloud Functions can write activity logs
+      allow write: if false;
+    }
+
+    // ============================================================
+    // ANALYTICS COLLECTION (Admin only)
+    // ============================================================
+
+    match /analytics/{docId} {
+      allow read: if false;
+      allow write: if false;
+    }
+  }
+}

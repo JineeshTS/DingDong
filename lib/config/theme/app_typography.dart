@@ -1,331 +1,320 @@
 import 'package:flutter/material.dart';
 
-import 'app_colors.dart';
-
-/// Application typography system
+/// Typography system for DingDong app
+/// Defines all text styles following Material Design 3 guidelines
 class AppTypography {
   AppTypography._(); // Private constructor
 
-  // Font families
-  static const String fontFamilyPrimary = 'Inter';
-  static const String fontFamilySecondary = 'Poppins';
+  // ==================== Font Families ====================
+  static const String primaryFontFamily = 'Inter';
+  static const String secondaryFontFamily = 'Roboto';
+  static const String monospaceFontFamily = 'RobotoMono';
 
-  // Font weights
+  // ==================== Font Weights ====================
+  static const FontWeight thin = FontWeight.w100;
+  static const FontWeight extraLight = FontWeight.w200;
   static const FontWeight light = FontWeight.w300;
   static const FontWeight regular = FontWeight.w400;
   static const FontWeight medium = FontWeight.w500;
   static const FontWeight semiBold = FontWeight.w600;
   static const FontWeight bold = FontWeight.w700;
+  static const FontWeight extraBold = FontWeight.w800;
+  static const FontWeight black = FontWeight.w900;
 
-  // Line heights
-  static const double lineHeightTight = 1.2;
-  static const double lineHeightNormal = 1.5;
-  static const double lineHeightRelaxed = 1.75;
+  // ==================== Display Styles (Large Headers) ====================
 
-  // Letter spacing
-  static const double letterSpacingTight = -0.5;
-  static const double letterSpacingNormal = 0.0;
-  static const double letterSpacingWide = 0.5;
-  static const double letterSpacingWidest = 1.0;
+  /// Display Large - 57px
+  /// Use for: Hero sections, splash screens
+  static const TextStyle displayLarge = TextStyle(
+    fontSize: 57,
+    fontWeight: bold,
+    height: 1.12,
+    letterSpacing: -0.25,
+    fontFamily: primaryFontFamily,
+  );
 
-  // Display text styles
-  static TextStyle displayLarge({Color? color}) => TextStyle(
-        fontFamily: fontFamilySecondary,
-        fontSize: 57,
-        fontWeight: bold,
-        letterSpacing: letterSpacingTight,
-        height: lineHeightTight,
-        color: color,
-      );
+  /// Display Medium - 45px
+  /// Use for: Large page titles
+  static const TextStyle displayMedium = TextStyle(
+    fontSize: 45,
+    fontWeight: bold,
+    height: 1.16,
+    letterSpacing: 0,
+    fontFamily: primaryFontFamily,
+  );
 
-  static TextStyle displayMedium({Color? color}) => TextStyle(
-        fontFamily: fontFamilySecondary,
-        fontSize: 45,
-        fontWeight: bold,
-        letterSpacing: letterSpacingTight,
-        height: lineHeightTight,
-        color: color,
-      );
+  /// Display Small - 36px
+  /// Use for: Section headers, onboarding
+  static const TextStyle displaySmall = TextStyle(
+    fontSize: 36,
+    fontWeight: bold,
+    height: 1.22,
+    letterSpacing: 0,
+    fontFamily: primaryFontFamily,
+  );
 
-  static TextStyle displaySmall({Color? color}) => TextStyle(
-        fontFamily: fontFamilySecondary,
-        fontSize: 36,
-        fontWeight: bold,
-        letterSpacing: letterSpacingNormal,
-        height: lineHeightTight,
-        color: color,
-      );
+  // ==================== Headline Styles ====================
 
-  // Headline text styles
-  static TextStyle headlineLarge({Color? color}) => TextStyle(
-        fontFamily: fontFamilySecondary,
-        fontSize: 32,
-        fontWeight: semiBold,
-        letterSpacing: letterSpacingNormal,
-        height: lineHeightTight,
-        color: color,
-      );
+  /// Headline Large - 32px
+  /// Use for: Screen titles, dialog titles
+  static const TextStyle headlineLarge = TextStyle(
+    fontSize: 32,
+    fontWeight: semiBold,
+    height: 1.25,
+    letterSpacing: 0,
+    fontFamily: primaryFontFamily,
+  );
 
-  static TextStyle headlineMedium({Color? color}) => TextStyle(
-        fontFamily: fontFamilySecondary,
-        fontSize: 28,
-        fontWeight: semiBold,
-        letterSpacing: letterSpacingNormal,
-        height: lineHeightTight,
-        color: color,
-      );
+  /// Headline Medium - 28px
+  /// Use for: Card titles, major sections
+  static const TextStyle headlineMedium = TextStyle(
+    fontSize: 28,
+    fontWeight: semiBold,
+    height: 1.29,
+    letterSpacing: 0,
+    fontFamily: primaryFontFamily,
+  );
 
-  static TextStyle headlineSmall({Color? color}) => TextStyle(
-        fontFamily: fontFamilySecondary,
-        fontSize: 24,
-        fontWeight: semiBold,
-        letterSpacing: letterSpacingNormal,
-        height: lineHeightNormal,
-        color: color,
-      );
+  /// Headline Small - 24px
+  /// Use for: List section headers, subheadings
+  static const TextStyle headlineSmall = TextStyle(
+    fontSize: 24,
+    fontWeight: semiBold,
+    height: 1.33,
+    letterSpacing: 0,
+    fontFamily: primaryFontFamily,
+  );
 
-  // Title text styles
-  static TextStyle titleLarge({Color? color}) => TextStyle(
-        fontFamily: fontFamilyPrimary,
-        fontSize: 22,
-        fontWeight: semiBold,
-        letterSpacing: letterSpacingNormal,
-        height: lineHeightNormal,
-        color: color,
-      );
+  // ==================== Title Styles ====================
 
-  static TextStyle titleMedium({Color? color}) => TextStyle(
-        fontFamily: fontFamilyPrimary,
-        fontSize: 18,
-        fontWeight: semiBold,
-        letterSpacing: letterSpacingNormal,
-        height: lineHeightNormal,
-        color: color,
-      );
+  /// Title Large - 22px
+  /// Use for: App bar titles, prominent list items
+  static const TextStyle titleLarge = TextStyle(
+    fontSize: 22,
+    fontWeight: medium,
+    height: 1.27,
+    letterSpacing: 0,
+    fontFamily: primaryFontFamily,
+  );
 
-  static TextStyle titleSmall({Color? color}) => TextStyle(
-        fontFamily: fontFamilyPrimary,
-        fontSize: 16,
-        fontWeight: semiBold,
-        letterSpacing: letterSpacingNormal,
-        height: lineHeightNormal,
-        color: color,
-      );
+  /// Title Medium - 16px
+  /// Use for: List item titles, card headers
+  static const TextStyle titleMedium = TextStyle(
+    fontSize: 16,
+    fontWeight: medium,
+    height: 1.5,
+    letterSpacing: 0.15,
+    fontFamily: primaryFontFamily,
+  );
 
-  // Body text styles
-  static TextStyle bodyLarge({Color? color}) => TextStyle(
-        fontFamily: fontFamilyPrimary,
-        fontSize: 16,
-        fontWeight: regular,
-        letterSpacing: letterSpacingNormal,
-        height: lineHeightNormal,
-        color: color,
-      );
+  /// Title Small - 14px
+  /// Use for: Dense list items, small cards
+  static const TextStyle titleSmall = TextStyle(
+    fontSize: 14,
+    fontWeight: medium,
+    height: 1.43,
+    letterSpacing: 0.1,
+    fontFamily: primaryFontFamily,
+  );
 
-  static TextStyle bodyMedium({Color? color}) => TextStyle(
-        fontFamily: fontFamilyPrimary,
-        fontSize: 14,
-        fontWeight: regular,
-        letterSpacing: letterSpacingNormal,
-        height: lineHeightNormal,
-        color: color,
-      );
+  // ==================== Body Styles ====================
 
-  static TextStyle bodySmall({Color? color}) => TextStyle(
-        fontFamily: fontFamilyPrimary,
-        fontSize: 12,
-        fontWeight: regular,
-        letterSpacing: letterSpacingNormal,
-        height: lineHeightNormal,
-        color: color,
-      );
+  /// Body Large - 16px
+  /// Use for: Primary body text, descriptions
+  static const TextStyle bodyLarge = TextStyle(
+    fontSize: 16,
+    fontWeight: regular,
+    height: 1.5,
+    letterSpacing: 0.5,
+    fontFamily: primaryFontFamily,
+  );
 
-  // Label text styles
-  static TextStyle labelLarge({Color? color}) => TextStyle(
-        fontFamily: fontFamilyPrimary,
-        fontSize: 14,
-        fontWeight: medium,
-        letterSpacing: letterSpacingWide,
-        height: lineHeightNormal,
-        color: color,
-      );
+  /// Body Medium - 14px
+  /// Use for: Secondary body text, supporting text
+  static const TextStyle bodyMedium = TextStyle(
+    fontSize: 14,
+    fontWeight: regular,
+    height: 1.43,
+    letterSpacing: 0.25,
+    fontFamily: primaryFontFamily,
+  );
 
-  static TextStyle labelMedium({Color? color}) => TextStyle(
-        fontFamily: fontFamilyPrimary,
-        fontSize: 12,
-        fontWeight: medium,
-        letterSpacing: letterSpacingWide,
-        height: lineHeightNormal,
-        color: color,
-      );
+  /// Body Small - 12px
+  /// Use for: Captions, helper text
+  static const TextStyle bodySmall = TextStyle(
+    fontSize: 12,
+    fontWeight: regular,
+    height: 1.33,
+    letterSpacing: 0.4,
+    fontFamily: primaryFontFamily,
+  );
 
-  static TextStyle labelSmall({Color? color}) => TextStyle(
-        fontFamily: fontFamilyPrimary,
-        fontSize: 11,
-        fontWeight: medium,
-        letterSpacing: letterSpacingWide,
-        height: lineHeightNormal,
-        color: color,
-      );
+  // ==================== Label Styles ====================
 
-  // Custom text styles for specific use cases
-  static TextStyle button({Color? color}) => TextStyle(
-        fontFamily: fontFamilyPrimary,
-        fontSize: 14,
-        fontWeight: semiBold,
-        letterSpacing: letterSpacingWide,
-        height: lineHeightNormal,
-        color: color,
-      );
+  /// Label Large - 14px
+  /// Use for: Buttons, tabs, prominent labels
+  static const TextStyle labelLarge = TextStyle(
+    fontSize: 14,
+    fontWeight: medium,
+    height: 1.43,
+    letterSpacing: 0.1,
+    fontFamily: primaryFontFamily,
+  );
 
-  static TextStyle buttonSmall({Color? color}) => TextStyle(
-        fontFamily: fontFamilyPrimary,
-        fontSize: 12,
-        fontWeight: semiBold,
-        letterSpacing: letterSpacingWide,
-        height: lineHeightNormal,
-        color: color,
-      );
+  /// Label Medium - 12px
+  /// Use for: Form labels, chips
+  static const TextStyle labelMedium = TextStyle(
+    fontSize: 12,
+    fontWeight: medium,
+    height: 1.33,
+    letterSpacing: 0.5,
+    fontFamily: primaryFontFamily,
+  );
 
-  static TextStyle caption({Color? color}) => TextStyle(
-        fontFamily: fontFamilyPrimary,
-        fontSize: 12,
-        fontWeight: regular,
-        letterSpacing: letterSpacingNormal,
-        height: lineHeightNormal,
-        color: color ?? AppColors.textSecondaryLight,
-      );
+  /// Label Small - 11px
+  /// Use for: Overlines, tiny labels
+  static const TextStyle labelSmall = TextStyle(
+    fontSize: 11,
+    fontWeight: medium,
+    height: 1.45,
+    letterSpacing: 0.5,
+    fontFamily: primaryFontFamily,
+  );
 
-  static TextStyle overline({Color? color}) => TextStyle(
-        fontFamily: fontFamilyPrimary,
-        fontSize: 10,
-        fontWeight: medium,
-        letterSpacing: letterSpacingWidest,
-        height: lineHeightNormal,
-        color: color ?? AppColors.textTertiaryLight,
-      );
+  // ==================== Specialized Styles ====================
 
-  // Task-specific styles
-  static TextStyle taskTitle({Color? color, bool completed = false}) => TextStyle(
-        fontFamily: fontFamilyPrimary,
-        fontSize: 16,
-        fontWeight: medium,
-        letterSpacing: letterSpacingNormal,
-        height: lineHeightNormal,
-        color: color,
-        decoration: completed ? TextDecoration.lineThrough : null,
-        decorationColor: color,
-      );
+  /// Button text style
+  static const TextStyle button = TextStyle(
+    fontSize: 14,
+    fontWeight: medium,
+    height: 1.43,
+    letterSpacing: 0.1,
+    fontFamily: primaryFontFamily,
+  );
 
-  static TextStyle taskDescription({Color? color}) => TextStyle(
-        fontFamily: fontFamilyPrimary,
-        fontSize: 14,
-        fontWeight: regular,
-        letterSpacing: letterSpacingNormal,
-        height: lineHeightRelaxed,
-        color: color ?? AppColors.textSecondaryLight,
-      );
+  /// Caption style
+  static const TextStyle caption = TextStyle(
+    fontSize: 12,
+    fontWeight: regular,
+    height: 1.33,
+    letterSpacing: 0.4,
+    fontFamily: primaryFontFamily,
+  );
 
-  static TextStyle taskDueDate({Color? color, bool overdue = false}) => TextStyle(
-        fontFamily: fontFamilyPrimary,
-        fontSize: 12,
-        fontWeight: medium,
-        letterSpacing: letterSpacingNormal,
-        height: lineHeightNormal,
-        color: overdue ? AppColors.error : (color ?? AppColors.textSecondaryLight),
-      );
+  /// Overline style
+  static const TextStyle overline = TextStyle(
+    fontSize: 10,
+    fontWeight: medium,
+    height: 1.6,
+    letterSpacing: 1.5,
+    fontFamily: primaryFontFamily,
+  );
 
-  // List-specific styles
-  static TextStyle listTitle({Color? color}) => TextStyle(
-        fontFamily: fontFamilyPrimary,
-        fontSize: 18,
-        fontWeight: semiBold,
-        letterSpacing: letterSpacingNormal,
-        height: lineHeightNormal,
-        color: color,
-      );
+  /// Monospace code style
+  static const TextStyle code = TextStyle(
+    fontSize: 14,
+    fontWeight: regular,
+    height: 1.5,
+    letterSpacing: 0,
+    fontFamily: monospaceFontFamily,
+  );
 
-  static TextStyle listSubtitle({Color? color}) => TextStyle(
-        fontFamily: fontFamilyPrimary,
-        fontSize: 14,
-        fontWeight: regular,
-        letterSpacing: letterSpacingNormal,
-        height: lineHeightNormal,
-        color: color ?? AppColors.textSecondaryLight,
-      );
+  // ==================== Task-Specific Styles ====================
 
-  // Section header style
-  static TextStyle sectionHeader({Color? color}) => TextStyle(
-        fontFamily: fontFamilyPrimary,
-        fontSize: 13,
-        fontWeight: semiBold,
-        letterSpacing: letterSpacingWide,
-        height: lineHeightNormal,
-        color: color ?? AppColors.textSecondaryLight,
-      );
+  /// Task title style
+  static const TextStyle taskTitle = TextStyle(
+    fontSize: 16,
+    fontWeight: medium,
+    height: 1.5,
+    letterSpacing: 0.15,
+    fontFamily: primaryFontFamily,
+  );
 
-  // Counter/badge style
-  static TextStyle counter({Color? color}) => TextStyle(
-        fontFamily: fontFamilyPrimary,
-        fontSize: 12,
-        fontWeight: bold,
-        letterSpacing: letterSpacingNormal,
-        height: lineHeightTight,
-        color: color ?? Colors.white,
-      );
+  /// Task description style
+  static const TextStyle taskDescription = TextStyle(
+    fontSize: 14,
+    fontWeight: regular,
+    height: 1.5,
+    letterSpacing: 0.25,
+    fontFamily: primaryFontFamily,
+  );
 
-  // Time display style
-  static TextStyle time({Color? color}) => TextStyle(
-        fontFamily: fontFamilySecondary,
-        fontSize: 48,
-        fontWeight: bold,
-        letterSpacing: letterSpacingTight,
-        height: lineHeightTight,
-        color: color,
-      );
+  /// Due date style
+  static const TextStyle dueDate = TextStyle(
+    fontSize: 12,
+    fontWeight: medium,
+    height: 1.33,
+    letterSpacing: 0.4,
+    fontFamily: primaryFontFamily,
+  );
 
-  static TextStyle timeSmall({Color? color}) => TextStyle(
-        fontFamily: fontFamilySecondary,
-        fontSize: 24,
-        fontWeight: semiBold,
-        letterSpacing: letterSpacingNormal,
-        height: lineHeightTight,
-        color: color,
-      );
+  /// Priority label style
+  static const TextStyle priorityLabel = TextStyle(
+    fontSize: 11,
+    fontWeight: semiBold,
+    height: 1.45,
+    letterSpacing: 0.5,
+    fontFamily: primaryFontFamily,
+  );
 
-  // Statistics style
-  static TextStyle statNumber({Color? color}) => TextStyle(
-        fontFamily: fontFamilySecondary,
-        fontSize: 32,
-        fontWeight: bold,
-        letterSpacing: letterSpacingTight,
-        height: lineHeightTight,
-        color: color,
-      );
+  /// Tag style
+  static const TextStyle tag = TextStyle(
+    fontSize: 12,
+    fontWeight: medium,
+    height: 1.33,
+    letterSpacing: 0.5,
+    fontFamily: primaryFontFamily,
+  );
 
-  static TextStyle statLabel({Color? color}) => TextStyle(
-        fontFamily: fontFamilyPrimary,
-        fontSize: 12,
-        fontWeight: medium,
-        letterSpacing: letterSpacingWide,
-        height: lineHeightNormal,
-        color: color ?? AppColors.textSecondaryLight,
-      );
-}
+  // ==================== Helper Methods ====================
 
-/// Extension on BuildContext for easy text style access
-extension AppTypographyExtension on BuildContext {
-  TextTheme get textTheme => Theme.of(this).textTheme;
+  /// Apply color to text style
+  static TextStyle withColor(TextStyle style, Color color) {
+    return style.copyWith(color: color);
+  }
 
-  bool get isDarkMode => Theme.of(this).brightness == Brightness.dark;
+  /// Apply font weight to text style
+  static TextStyle withWeight(TextStyle style, FontWeight weight) {
+    return style.copyWith(fontWeight: weight);
+  }
 
-  // Convenience getters for text colors
-  Color get textPrimary =>
-      isDarkMode ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-  Color get textSecondary =>
-      isDarkMode ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
-  Color get textTertiary =>
-      isDarkMode ? AppColors.textTertiaryDark : AppColors.textTertiaryLight;
-  Color get textDisabled =>
-      isDarkMode ? AppColors.textDisabledDark : AppColors.textDisabledLight;
+  /// Apply font size to text style
+  static TextStyle withSize(TextStyle style, double size) {
+    return style.copyWith(fontSize: size);
+  }
+
+  /// Apply line height to text style
+  static TextStyle withHeight(TextStyle style, double height) {
+    return style.copyWith(height: height);
+  }
+
+  /// Apply letter spacing to text style
+  static TextStyle withLetterSpacing(TextStyle style, double spacing) {
+    return style.copyWith(letterSpacing: spacing);
+  }
+
+  /// Make text style bold
+  static TextStyle makeBold(TextStyle style) {
+    return style.copyWith(fontWeight: bold);
+  }
+
+  /// Make text style italic
+  static TextStyle makeItalic(TextStyle style) {
+    return style.copyWith(fontStyle: FontStyle.italic);
+  }
+
+  /// Add underline to text style
+  static TextStyle underline(TextStyle style) {
+    return style.copyWith(decoration: TextDecoration.underline);
+  }
+
+  /// Add strikethrough to text style (useful for completed tasks)
+  static TextStyle strikethrough(TextStyle style) {
+    return style.copyWith(decoration: TextDecoration.lineThrough);
+  }
+
+  /// Scale text style for accessibility
+  static TextStyle scale(TextStyle style, double factor) {
+    return style.copyWith(fontSize: (style.fontSize ?? 14) * factor);
+  }
 }

@@ -330,6 +330,75 @@
 - 3.6.9 Evening review prompt
 - 3.6.10 Morning planning prompt
 
+### 3.7 Timebox Daily Agenda View
+- 3.7.1 Timebox entity and models
+  - 3.7.1.1 TimeboxEntity with daily agenda structure
+  - 3.7.1.2 TimeboxSlot for time-blocked tasks
+  - 3.7.1.3 TimeConflict for overlap detection
+  - 3.7.1.4 TimeboxSummary for daily statistics
+  - 3.7.1.5 TimeboxSettings for user preferences
+  - 3.7.1.6 TaskCategory (Personal/Professional/Health/Learning/etc.)
+- 3.7.2 Timebox repository interface
+  - 3.7.2.1 CRUD operations for timebox
+  - 3.7.2.2 Slot management operations
+  - 3.7.2.3 Conflict detection operations
+  - 3.7.2.4 Task scheduling operations
+  - 3.7.2.5 Query operations for date ranges
+  - 3.7.2.6 Settings management
+  - 3.7.2.7 Real-time sync streams
+- 3.7.3 Timebox use cases
+  - 3.7.3.1 GetDailyTimeboxUseCase
+  - 3.7.3.2 CreateTimeboxSlotUseCase
+  - 3.7.3.3 UpdateTimeboxSlotUseCase
+  - 3.7.3.4 DeleteTimeboxSlotUseCase
+  - 3.7.3.5 DetectTimeConflictsUseCase
+  - 3.7.3.6 AutoScheduleTasksUseCase
+  - 3.7.3.7 RescheduleSlotUseCase
+  - 3.7.3.8 CompleteTimeboxSlotUseCase
+- 3.7.4 Timebox data layer
+  - 3.7.4.1 TimeboxModel (Freezed)
+  - 3.7.4.2 TimeboxSlotModel
+  - 3.7.4.3 Firebase remote data source
+  - 3.7.4.4 Isar local data source
+  - 3.7.4.5 Repository implementation with offline-first
+- 3.7.5 Timebox service
+  - 3.7.5.1 Conflict detection algorithm
+  - 3.7.5.2 Auto-scheduling logic
+  - 3.7.5.3 Category inference from tasks/lists
+  - 3.7.5.4 Time slot suggestions
+- 3.7.6 Timebox state management
+  - 3.7.6.1 TimeboxState (Freezed)
+  - 3.7.6.2 TimeboxNotifier (StateNotifier)
+  - 3.7.6.3 Timebox providers
+  - 3.7.6.4 Derived providers (conflicts, summary, etc.)
+- 3.7.7 Timebox UI components
+  - 3.7.7.1 Timeline view (vertical daily agenda)
+  - 3.7.7.2 Time slot card widget
+  - 3.7.7.3 Conflict highlight widget
+  - 3.7.7.4 Category filter chips
+  - 3.7.7.5 Priority indicator badges
+  - 3.7.7.6 Available slot placeholder
+  - 3.7.7.7 Drag-and-drop rescheduling
+  - 3.7.7.8 Add slot dialog
+  - 3.7.7.9 Slot detail bottom sheet
+- 3.7.8 Timebox screen
+  - 3.7.8.1 Daily agenda screen
+  - 3.7.8.2 Date picker navigation
+  - 3.7.8.3 Category breakdown section
+  - 3.7.8.4 Conflict resolution dialog
+  - 3.7.8.5 Summary statistics header
+  - 3.7.8.6 Quick actions (add, auto-schedule)
+- 3.7.9 Timebox features
+  - 3.7.9.1 Personal tasks highlighting (green)
+  - 3.7.9.2 Professional tasks highlighting (blue)
+  - 3.7.9.3 Priority tasks highlighting (red badge)
+  - 3.7.9.4 Time conflict visual indicators
+  - 3.7.9.5 Current time indicator line
+  - 3.7.9.6 Overdue task highlighting
+  - 3.7.9.7 Completion progress tracking
+  - 3.7.9.8 Day-at-a-glance summary
+  - 3.7.9.9 Export daily agenda (PDF/Calendar)
+
 ---
 
 ## 4.0 PRODUCTIVITY FEATURES

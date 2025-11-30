@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
-import '../../providers/auth/auth_providers.dart';
+import '../../providers/auth/auth.dart';
 
 /// Splash screen shown on app launch
 class SplashScreen extends ConsumerStatefulWidget {
@@ -14,54 +14,19 @@ class SplashScreen extends ConsumerStatefulWidget {
   ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends ConsumerState<SplashScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
-  late Animation<double> _scaleAnimation;
-
+class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   void initState() {
     super.initState();
-
-    // Setup animations
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    );
-
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
-      ),
-    );
-
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
-      ),
-    );
-
-    // Start animation
-    _animationController.forward();
-
-    // Check auth and navigate
     _initializeApp();
   }
 
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
   Future<void> _initializeApp() async {
-    // Start checking auth status
-    await ref.read(authNotifierProvider.notifier).checkAuthStatus();
+    // Check authentication status
+    final authNotifier = ref.read(authNotifierProvider.notifier);
+    await authNotifier.checkAuthStatus();
 
-    // Minimum splash duration for branding
+    // Wait for splash duration
     await Future.delayed(
       const Duration(milliseconds: AppConstants.splashScreenDuration),
     );
@@ -70,12 +35,19 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
     // Navigate based on auth state
     final authState = ref.read(authNotifierProvider);
-
-    if (authState.isAuthenticated) {
-      context.go('/home');
-    } else {
-      context.go('/login');
-    }
+    authState.when(
+      initial: () => context.go('/login'),
+      authenticated: (_) => context.go('/home'),
+      unauthenticated: () => context.go('/login'),
+      loading: (user, _) {
+        if (user != null) {
+          context.go('/home');
+        } else {
+          context.go('/login');
+        }
+      },
+      error: (_, __) => context.go('/login'),
+    );
   }
 
   @override

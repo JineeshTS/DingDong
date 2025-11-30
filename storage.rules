@@ -1,0 +1,165 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ============================================================
+    // HELPER FUNCTIONS
+    // ============================================================
+
+    // Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Check if user owns the resource based on path
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Validate file size (in bytes)
+    function isValidFileSize(maxSize) {
+      return request.resource.size < maxSize;
+    }
+
+    // Validate file type
+    function isValidImageType() {
+      return request.resource.contentType.matches('image/.*');
+    }
+
+    function isValidDocumentType() {
+      return request.resource.contentType.matches('application/pdf') ||
+             request.resource.contentType.matches('application/msword') ||
+             request.resource.contentType.matches('application/vnd.openxmlformats-officedocument.*') ||
+             request.resource.contentType.matches('text/.*');
+    }
+
+    function isValidAudioType() {
+      return request.resource.contentType.matches('audio/.*');
+    }
+
+    // ============================================================
+    // USER PROFILE IMAGES
+    // ============================================================
+
+    match /users/{userId}/profile/{fileName} {
+      // Anyone can read profile images
+      allow read: if true;
+
+      // Only owner can upload
+      allow create: if isOwner(userId) &&
+        isValidImageType() &&
+        isValidFileSize(5 * 1024 * 1024); // 5MB max
+
+      // Only owner can update
+      allow update: if isOwner(userId) &&
+        isValidImageType() &&
+        isValidFileSize(5 * 1024 * 1024);
+
+      // Only owner can delete
+      allow delete: if isOwner(userId);
+    }
+
+    // ============================================================
+    // TASK ATTACHMENTS
+    // ============================================================
+
+    match /tasks/{taskId}/attachments/{fileName} {
+      // Read: Authenticated users (additional checks in Firestore)
+      allow read: if isAuthenticated();
+
+      // Create: Authenticated users, max 25MB
+      allow create: if isAuthenticated() &&
+        isValidFileSize(25 * 1024 * 1024);
+
+      // Delete: Authenticated users (ownership checked in Firestore)
+      allow delete: if isAuthenticated();
+    }
+
+    // ============================================================
+    // WORKSPACE FILES
+    // ============================================================
+
+    match /workspaces/{workspaceId}/files/{allPaths=**} {
+      // Read: Authenticated users (membership checked in Firestore)
+      allow read: if isAuthenticated();
+
+      // Create: Authenticated users, max 50MB
+      allow create: if isAuthenticated() &&
+        isValidFileSize(50 * 1024 * 1024);
+
+      // Delete: Authenticated users (permissions checked in Firestore)
+      allow delete: if isAuthenticated();
+    }
+
+    // ============================================================
+    // VOICE NOTES
+    // ============================================================
+
+    match /voice_notes/{userId}/{noteId} {
+      // Only owner can access
+      allow read: if isOwner(userId);
+
+      // Only owner can upload, max 10MB, audio only
+      allow create: if isOwner(userId) &&
+        isValidAudioType() &&
+        isValidFileSize(10 * 1024 * 1024);
+
+      // Only owner can delete
+      allow delete: if isOwner(userId);
+    }
+
+    // ============================================================
+    // AI IMAGE RECOGNITION UPLOADS
+    // ============================================================
+
+    match /ai_recognition/{userId}/{uploadId} {
+      // Only owner can access
+      allow read: if isOwner(userId);
+
+      // Only owner can upload, max 10MB, images only
+      allow create: if isOwner(userId) &&
+        isValidImageType() &&
+        isValidFileSize(10 * 1024 * 1024);
+
+      // Auto-delete after processing (via Cloud Functions)
+      allow delete: if isOwner(userId);
+    }
+
+    // ============================================================
+    // TEMP UPLOADS (Auto-cleanup)
+    // ============================================================
+
+    match /temp/{userId}/{allPaths=**} {
+      // Only owner can access
+      allow read: if isOwner(userId);
+
+      // Only owner can upload, max 50MB
+      allow create: if isOwner(userId) &&
+        isValidFileSize(50 * 1024 * 1024);
+
+      // Only owner can delete
+      allow delete: if isOwner(userId);
+    }
+
+    // ============================================================
+    // APP ASSETS (Public, Read-only)
+    // ============================================================
+
+    match /public/{allPaths=**} {
+      // Anyone can read public assets
+      allow read: if true;
+
+      // Only admin can write (via Firebase Console or Cloud Functions)
+      allow write: if false;
+    }
+
+    // ============================================================
+    // DEFAULT: Deny all other access
+    // ============================================================
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
