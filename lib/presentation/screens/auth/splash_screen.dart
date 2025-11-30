@@ -1,24 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_constants.dart';
+import '../../providers/auth/auth.dart';
 
 /// Splash screen shown on app launch
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _navigateToNext();
+    _initializeApp();
   }
 
-  Future<void> _navigateToNext() async {
+  Future<void> _initializeApp() async {
+    // Check authentication status
+    final authNotifier = ref.read(authNotifierProvider.notifier);
+    await authNotifier.checkAuthStatus();
+
     // Wait for splash duration
     await Future.delayed(
       const Duration(milliseconds: AppConstants.splashScreenDuration),
@@ -26,10 +32,21 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (!mounted) return;
 
-    // TODO: Check authentication status
-    // TODO: Check if onboarding is completed
-    // For now, navigate to login
-    context.go('/login');
+    // Navigate based on auth state
+    final authState = ref.read(authNotifierProvider);
+    authState.when(
+      initial: () => context.go('/login'),
+      authenticated: (_) => context.go('/home'),
+      unauthenticated: () => context.go('/login'),
+      loading: (user, _) {
+        if (user != null) {
+          context.go('/home');
+        } else {
+          context.go('/login');
+        }
+      },
+      error: (_, __) => context.go('/login'),
+    );
   }
 
   @override

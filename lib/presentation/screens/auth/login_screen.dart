@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/constants/app_constants.dart';
+import '../../../config/theme/design_system.dart';
+import '../../common/widgets/widgets.dart';
+import '../../providers/auth_provider.dart';
 
-/// Login screen
-class LoginScreen extends StatefulWidget {
+/// Enhanced login screen using design system
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _obscurePassword = true;
   bool _isLoading = false;
 
   @override
@@ -30,27 +32,96 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _isLoading = true);
 
-    // TODO: Implement actual login logic
-    await Future.delayed(const Duration(seconds: 2));
+    final result = await ref.read(authNotifierProvider.notifier).signInWithEmail(
+          _emailController.text.trim(),
+          _passwordController.text,
+        );
 
     if (!mounted) return;
 
     setState(() => _isLoading = false);
 
-    // TODO: Navigate to home on successful login
-    context.go('/home');
+    result.fold(
+      (failure) {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(failure.message),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      },
+      (user) {
+        // Navigate to home on success
+        context.go('/home');
+      },
+    );
   }
 
   Future<void> _handleGoogleSignIn() async {
-    // TODO: Implement Google Sign In
+    setState(() => _isLoading = true);
+
+    final result = await ref.read(authNotifierProvider.notifier).signInWithGoogle();
+
+    if (!mounted) return;
+
+    setState(() => _isLoading = false);
+
+    result.fold(
+      (failure) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(failure.message),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      },
+      (user) => context.go('/home'),
+    );
   }
 
   Future<void> _handleAppleSignIn() async {
-    // TODO: Implement Apple Sign In
+    setState(() => _isLoading = true);
+
+    final result = await ref.read(authNotifierProvider.notifier).signInWithApple();
+
+    if (!mounted) return;
+
+    setState(() => _isLoading = false);
+
+    result.fold(
+      (failure) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(failure.message),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      },
+      (user) => context.go('/home'),
+    );
   }
 
   Future<void> _handleMicrosoftSignIn() async {
-    // TODO: Implement Microsoft Sign In
+    setState(() => _isLoading = true);
+
+    final result = await ref.read(authNotifierProvider.notifier).signInWithMicrosoft();
+
+    if (!mounted) return;
+
+    setState(() => _isLoading = false);
+
+    result.fold(
+      (failure) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(failure.message),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      },
+      (user) => context.go('/home'),
+    );
   }
 
   @override
@@ -58,74 +129,65 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          padding: AppSpacing.pagePadding,
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 48),
+                AppSpacing.verticalSpaceXXL,
+
                 // App logo
                 Icon(
                   Icons.task_alt,
-                  size: 80,
-                  color: Theme.of(context).colorScheme.primary,
+                  size: AppSpacing.iconXXL + 16,
+                  color: AppColors.primary,
                 ),
-                const SizedBox(height: 24),
+                AppSpacing.verticalSpaceXL,
+
                 // Welcome text
                 Text(
                   'Welcome Back!',
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: AppTypography.headlineLarge,
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 8),
+                AppSpacing.verticalSpaceXS,
                 Text(
-                  'Sign in to continue',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Colors.grey,
-                      ),
+                  'Sign in to continue to DingDong',
+                  style: AppTypography.bodyLarge.copyWith(
+                    color: AppColors.gray600,
+                  ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 48),
+                AppSpacing.verticalSpaceXXL,
+
                 // Email field
-                TextFormField(
+                AppTextField(
                   controller: _emailController,
+                  label: 'Email',
+                  hint: 'Enter your email',
                   keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    prefixIcon: Icon(Icons.email_outlined),
-                  ),
+                  prefixIcon: const Icon(Icons.email_outlined),
+                  textInputAction: TextInputAction.next,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
                     }
-                    if (!RegExp(AppConstants.emailPattern).hasMatch(value)) {
+                    if (!AppConstants.emailRegex.hasMatch(value)) {
                       return 'Please enter a valid email';
                     }
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                AppSpacing.verticalSpaceMD,
+
                 // Password field
-                TextFormField(
+                AppPasswordField(
                   controller: _passwordController,
-                  obscureText: _obscurePassword,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    prefixIcon: const Icon(Icons.lock_outlined),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_outlined
-                            : Icons.visibility_off_outlined,
-                      ),
-                      onPressed: () {
-                        setState(() => _obscurePassword = !_obscurePassword);
-                      },
-                    ),
-                  ),
+                  label: 'Password',
+                  hint: 'Enter your password',
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (_) => _handleLogin(),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your password';
@@ -136,92 +198,91 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 8),
+                AppSpacing.verticalSpaceXS,
+
                 // Forgot password
                 Align(
                   alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      // TODO: Navigate to forgot password screen
-                    },
+                  child: AppButton(
+                    onPressed: () => context.push('/forgot-password'),
+                    variant: AppButtonVariant.text,
+                    size: AppButtonSize.small,
                     child: const Text('Forgot Password?'),
                   ),
                 ),
-                const SizedBox(height: 24),
+                AppSpacing.verticalSpaceXL,
+
                 // Login button
-                ElevatedButton(
-                  onPressed: _isLoading ? null : _handleLogin,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    child: _isLoading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                          )
-                        : const Text(
-                            'Sign In',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                  ),
+                AppButton(
+                  onPressed: _handleLogin,
+                  fullWidth: true,
+                  loading: _isLoading,
+                  enabled: !_isLoading,
+                  child: const Text('Sign In'),
                 ),
-                const SizedBox(height: 24),
+                AppSpacing.verticalSpaceXL,
+
                 // Divider
                 Row(
                   children: [
-                    const Expanded(child: Divider()),
+                    const Expanded(child: Divider(color: AppColors.gray300)),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      padding: AppSpacing.horizontalMD,
                       child: Text(
-                        'OR',
-                        style: TextStyle(color: Colors.grey[600]),
+                        'OR CONTINUE WITH',
+                        style: AppTypography.labelSmall.copyWith(
+                          color: AppColors.gray600,
+                        ),
                       ),
                     ),
-                    const Expanded(child: Divider()),
+                    const Expanded(child: Divider(color: AppColors.gray300)),
                   ],
                 ),
-                const SizedBox(height: 24),
-                // Google Sign In
-                OutlinedButton.icon(
+                AppSpacing.verticalSpaceXL,
+
+                // Social sign-in buttons
+                AppButton(
                   onPressed: _handleGoogleSignIn,
-                  icon: const Icon(Icons.g_mobiledata, size: 24),
-                  label: const Text('Continue with Google'),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
+                  variant: AppButtonVariant.outlined,
+                  fullWidth: true,
+                  enabled: !_isLoading,
+                  icon: Icons.g_mobiledata,
+                  child: const Text('Continue with Google'),
                 ),
-                const SizedBox(height: 12),
-                // Apple Sign In
-                OutlinedButton.icon(
+                AppSpacing.verticalSpaceSM,
+
+                AppButton(
                   onPressed: _handleAppleSignIn,
-                  icon: const Icon(Icons.apple, size: 24),
-                  label: const Text('Continue with Apple'),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
+                  variant: AppButtonVariant.outlined,
+                  fullWidth: true,
+                  enabled: !_isLoading,
+                  icon: Icons.apple,
+                  child: const Text('Continue with Apple'),
                 ),
-                const SizedBox(height: 12),
-                // Microsoft Sign In
-                OutlinedButton.icon(
+                AppSpacing.verticalSpaceSM,
+
+                AppButton(
                   onPressed: _handleMicrosoftSignIn,
-                  icon: const Icon(Icons.microsoft, size: 24),
-                  label: const Text('Continue with Microsoft'),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
+                  variant: AppButtonVariant.outlined,
+                  fullWidth: true,
+                  enabled: !_isLoading,
+                  icon: Icons.microsoft,
+                  child: const Text('Continue with Microsoft'),
                 ),
-                const SizedBox(height: 24),
+                AppSpacing.verticalSpaceXL,
+
                 // Sign up link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Don't have an account?"),
-                    TextButton(
+                    Text(
+                      "Don't have an account?",
+                      style: AppTypography.bodyMedium,
+                    ),
+                    AppButton(
                       onPressed: () => context.go('/register'),
+                      variant: AppButtonVariant.text,
+                      size: AppButtonSize.small,
                       child: const Text('Sign Up'),
                     ),
                   ],
