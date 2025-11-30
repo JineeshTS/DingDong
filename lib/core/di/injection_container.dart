@@ -16,6 +16,7 @@ import '../../data/datasources/remote/firebase_attachment_remote_datasource.dart
 import '../../data/datasources/remote/firebase_habit_remote_datasource.dart';
 import '../../data/datasources/remote/firebase_focus_session_remote_datasource.dart';
 import '../../data/datasources/remote/firebase_workspace_remote_datasource.dart';
+import '../../data/datasources/remote/firebase_timebox_remote_data_source.dart';
 
 // Data Sources - Local (Isar)
 import '../../data/datasources/local/isar_user_local_datasource.dart';
@@ -29,6 +30,7 @@ import '../../data/datasources/local/isar_habit_local_datasource.dart';
 import '../../data/datasources/local/isar_focus_session_local_datasource.dart';
 import '../../data/datasources/local/isar_workspace_local_datasource.dart';
 import '../../data/datasources/local/isar_activity_log_local_datasource.dart';
+import '../../data/datasources/local/isar/isar_timebox_local_data_source.dart';
 
 // Repositories
 import '../../data/repositories/auth_repository_impl.dart';
@@ -42,6 +44,7 @@ import '../../data/repositories/attachment_repository_impl.dart';
 import '../../data/repositories/habit_repository_impl.dart';
 import '../../data/repositories/focus_session_repository_impl.dart';
 import '../../data/repositories/workspace_repository_impl.dart';
+import '../../data/repositories/timebox_repository_impl.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/repositories/task_repository.dart';
 import '../../domain/repositories/list_repository.dart';
@@ -53,6 +56,10 @@ import '../../domain/repositories/attachment_repository.dart';
 import '../../domain/repositories/habit_repository.dart';
 import '../../domain/repositories/focus_session_repository.dart';
 import '../../domain/repositories/workspace_repository.dart';
+import '../../domain/repositories/timebox_repository.dart';
+
+// Services
+import '../../core/services/timebox_service.dart';
 
 // Use Cases - Authentication
 import '../../domain/usecases/auth/sign_in_with_email_usecase.dart';
@@ -195,6 +202,16 @@ import '../../domain/usecases/workspace/leave_workspace_usecase.dart';
 import '../../domain/usecases/workspace/transfer_ownership_usecase.dart';
 import '../../domain/usecases/workspace/get_workspace_statistics_usecase.dart';
 
+// Use Cases - Timebox
+import '../../domain/usecases/timebox/get_daily_timebox_usecase.dart';
+import '../../domain/usecases/timebox/create_timebox_slot_usecase.dart';
+import '../../domain/usecases/timebox/update_timebox_slot_usecase.dart';
+import '../../domain/usecases/timebox/delete_timebox_slot_usecase.dart';
+import '../../domain/usecases/timebox/detect_time_conflicts_usecase.dart';
+import '../../domain/usecases/timebox/auto_schedule_tasks_usecase.dart';
+import '../../domain/usecases/timebox/reschedule_slot_usecase.dart';
+import '../../domain/usecases/timebox/complete_timebox_slot_usecase.dart';
+
 /// Service Locator for Dependency Injection
 ///
 /// This class manages all dependencies for the application using get_it.
@@ -286,6 +303,10 @@ Future<void> initializeDependencies() async {
     () => FirebaseWorkspaceRemoteDataSource(firestore: sl()),
   );
 
+  sl.registerLazySingleton<FirebaseTimeboxRemoteDataSource>(
+    () => FirebaseTimeboxRemoteDataSourceImpl(firestore: sl()),
+  );
+
   // ===========================
   // Data Sources - Local (Isar)
   // ===========================
@@ -333,6 +354,18 @@ Future<void> initializeDependencies() async {
 
   sl.registerLazySingleton<IsarActivityLogLocalDataSource>(
     () => IsarActivityLogLocalDataSource(sl<Isar>()),
+  );
+
+  sl.registerLazySingleton<IsarTimeboxLocalDataSource>(
+    () => IsarTimeboxLocalDataSourceImpl(),
+  );
+
+  // ===========================
+  // Services
+  // ===========================
+
+  sl.registerLazySingleton<TimeboxService>(
+    () => TimeboxService(),
   );
 
   // ===========================
@@ -412,6 +445,14 @@ Future<void> initializeDependencies() async {
     () => WorkspaceRepositoryImpl(
       remoteDataSource: sl(),
       localDataSource: sl(),
+    ),
+  );
+
+  sl.registerLazySingleton<TimeboxRepository>(
+    () => TimeboxRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+      timeboxService: sl(),
     ),
   );
 
@@ -588,6 +629,19 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton(() => LeaveWorkspaceUseCase(sl()));
   sl.registerLazySingleton(() => TransferOwnershipUseCase(sl()));
   sl.registerLazySingleton(() => GetWorkspaceStatisticsUseCase(sl()));
+
+  // ===========================
+  // Use Cases - Timebox (8 use cases)
+  // ===========================
+
+  sl.registerLazySingleton(() => GetDailyTimeboxUseCase(sl()));
+  sl.registerLazySingleton(() => CreateTimeboxSlotUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateTimeboxSlotUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteTimeboxSlotUseCase(sl()));
+  sl.registerLazySingleton(() => DetectTimeConflictsUseCase(sl()));
+  sl.registerLazySingleton(() => AutoScheduleTasksUseCase(sl()));
+  sl.registerLazySingleton(() => RescheduleSlotUseCase(sl()));
+  sl.registerLazySingleton(() => CompleteTimeboxSlotUseCase(sl()));
 }
 
 /// Reset all dependencies (useful for testing)
